@@ -1,0 +1,38 @@
+{
+  "name": "medflow-health-platform",
+  "version": "1.0.0",
+  "description": "Enterprise Healthcare Management, EHR, Telehealth and Hospital Operations Platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "healthcare",
+    "ehr",
+    "emr",
+    "telehealth",
+    "hospital-management",
+    "hipaa-compliant",
+    "react",
+    "nodejs",
+    "typescript",
+    "clinical-decision-support"
+  ],
+  "author": "MedFlow Health Engineering Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
