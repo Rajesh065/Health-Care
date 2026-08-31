@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { PatientController } from '../controllers/patientController';
+import { authenticate } from '../middleware/auth';
+const router = Router();
+router.use(authenticate);
+router.get('/', PatientController.getAll);
+router.get('/:id', PatientController.getById);
+router.post('/', PatientController.create);
+router.post('/:id/vitals', PatientController.addVitals);
+export default router;

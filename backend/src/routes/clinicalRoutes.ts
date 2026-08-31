@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { ClinicalController } from '../controllers/clinicalController';
+import { authenticate } from '../middleware/auth';
+const router = Router();
+router.use(authenticate);
+router.get('/diagnoses/search', ClinicalController.searchDiagnoses);
+router.post('/safety-check', ClinicalController.checkSafety);
+router.get('/soap/:patientId', ClinicalController.getSoapNotes);
+router.post('/soap', ClinicalController.createSoapNote);
+export default router;
