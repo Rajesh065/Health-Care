@@ -1,4 +1,4 @@
-export type UserPersona = 'MD' | 'RECEPTIONIST' | 'PATIENT';
+export type UserPersona = 'MANAGER' | 'RECEPTIONIST' | 'PATIENT';
 
 export type AppointmentStatus = 'Waiting' | 'Accepted' | 'Completed' | 'Rejected';
 
@@ -43,61 +43,63 @@ export interface Appointment {
   createdAt: string;
 }
 
-export interface InpatientAdmitRecord {
-  id: string;
-  patientId: string;
-  patientName: string;
-  age: number;
-  gender: string;
-  ward: string;
-  bedNumber: string;
-  admitTime: string;
-  diagnosis: string;
-  attendingDoctor: string;
-  condition: 'Stable' | 'Critical (ICU)' | 'Under Observation';
-}
-
-export interface DischargeRecord {
-  id: string;
-  patientId: string;
-  patientName: string;
-  age: number;
-  ward: string;
-  dischargeTime: string;
-  doctorApproved: string;
-  summary: string;
-}
-
-export interface StaffAttendanceRecord {
+export interface HospitalEquipment {
   id: string;
   name: string;
-  role: string;
+  model: string;
   department: string;
-  status: 'ON_DUTY' | 'ON_LEAVE';
-  shiftTime?: string;
-  leaveReason?: string;
-  substituteCover?: string;
+  location: string;
+  status: 'Operational' | 'Maintenance Due' | 'Under Calibration';
+  lastServiced: string;
+  nextServiceDue: string;
+  technicianInCharge: string;
 }
 
-export interface MDStats {
-  admittedTodayCount: number;
-  dischargedTodayCount: number;
+export interface WardBedAllocation {
+  id: string;
+  wardName: string;
+  floor: string;
   totalBeds: number;
   occupiedBeds: number;
-  icuOccupancyPercent: number;
-  activeSurgeriesCount: number;
-  totalStaffCount: number;
-  staffOnDutyCount: number;
-  staffOnLeaveCount: number;
-  todayRevenueUsd: number;
-  revenueBreakdown: {
-    inpatientWardCharges: number;
-    opdConsultations: number;
-    surgeriesAndOT: number;
-    pharmacyDispensary: number;
-    labDiagnostics: number;
-  };
-  bloodBankOveUnits: number;
-  oxygenReservesPercent: number;
-  erWaitTimeMinutes: number;
+  availableBeds: number;
+  headNurse: string;
+  ventilatorCount: number;
+}
+
+export interface EmployeeLeaveRecord {
+  id: string;
+  employeeName: string;
+  role: string;
+  department: string;
+  leaveType: 'Medical' | 'Casual' | 'Emergency' | 'Conference';
+  startDate: string;
+  endDate: string;
+  reason: string;
+  substituteCover: string;
+  approvalStatus: 'Approved' | 'Pending Review';
+}
+
+export interface SupplyItem {
+  id: string;
+  itemName: string;
+  category: 'Critical Medicine' | 'Surgical & Consumables' | 'Blood Bank' | 'Gas & Power';
+  currentStock: string;
+  status: 'Adequate' | 'Reorder Soon' | 'Optimal';
+  reorderLevel: string;
+}
+
+export interface ManagerStats {
+  totalBeds: number;
+  occupiedBeds: number;
+  availableBeds: number;
+  bedOccupancyPercent: number;
+  totalEquipmentCount: number;
+  operationalEquipmentCount: number;
+  equipmentNeedsServiceCount: number;
+  totalEmployeesCount: number;
+  employeesOnDutyCount: number;
+  employeesOnLeaveCount: number;
+  activeAmbulancesReady: number;
+  oxygenLevelPercent: number;
+  powerBackupStatus: string;
 }

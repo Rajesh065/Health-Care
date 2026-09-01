@@ -6,7 +6,7 @@ import {
   ChevronDown,
   User,
   LogOut,
-  ShieldCheck,
+  Building2,
   CalendarCheck
 } from 'lucide-react';
 
@@ -30,10 +30,10 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
 
         {/* Center: Current Authorized Role Badge */}
         <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
-          {persona === 'MD' && (
+          {persona === 'MANAGER' && (
             <>
-              <ShieldCheck className="w-4 h-4 text-amber-700" />
-              <span>MD (Hospital Owner & Managing Director)</span>
+              <Building2 className="w-4 h-4 text-blue-700" />
+              <span>Manager (Hospital Operations & Facility Control)</span>
             </>
           )}
           {persona === 'RECEPTIONIST' && (
@@ -71,7 +71,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
               className="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200"
             >
               <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs shadow-xs ${
-                persona === 'MD' ? 'bg-amber-700' :
+                persona === 'MANAGER' ? 'bg-blue-700' :
                 persona === 'RECEPTIONIST' ? 'bg-teal-700' : 'bg-purple-700'
               }`}>
                 {currentUser.name.charAt(0)}
@@ -79,7 +79,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
               <div className="hidden md:block text-left text-xs">
                 <span className="font-bold text-slate-900 block leading-tight">{currentUser.name}</span>
                 <span className="text-[10px] text-slate-500 font-medium block leading-tight">
-                  {persona === 'MD' ? 'MD (Hospital Owner)' : persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}
+                  {persona === 'MANAGER' ? 'Hospital Manager' : persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}
                 </span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
@@ -90,7 +90,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                 <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="font-bold text-slate-900 block">{currentUser.name}</span>
                   <span className="text-[10px] text-slate-400 font-mono block">{currentUser.email}</span>
-                  <span className="text-[10px] text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded font-bold inline-block mt-1">
+                  <span className="text-[10px] text-blue-900 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-bold inline-block mt-1">
                     {currentUser.role}
                   </span>
                 </div>
@@ -109,10 +109,10 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          {u.persona === 'MD' && <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />}
-                          {u.persona === 'RECEPTIONIST' && <CalendarCheck className="w-3.5 h-3.5 text-teal-500" />}
-                          {u.persona === 'PATIENT' && <User className="w-3.5 h-3.5 text-purple-500" />}
-                          <span>{u.persona === 'MD' ? 'MD (Hospital Owner)' : u.persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}</span>
+                          {u.persona === 'MANAGER' && <Building2 className="w-3.5 h-3.5 text-blue-400" />}
+                          {u.persona === 'RECEPTIONIST' && <CalendarCheck className="w-3.5 h-3.5 text-teal-400" />}
+                          {u.persona === 'PATIENT' && <User className="w-3.5 h-3.5 text-purple-400" />}
+                          <span>{u.persona === 'MANAGER' ? 'Manager (Hospital Operations)' : u.persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}</span>
                         </div>
                       </button>
                     ))}

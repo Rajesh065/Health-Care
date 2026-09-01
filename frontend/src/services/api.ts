@@ -1,10 +1,11 @@
 import {
   Appointment,
-  InpatientAdmitRecord,
-  DischargeRecord,
-  MDStats,
-  MedicalDomain,
-  StaffAttendanceRecord
+  HospitalEquipment,
+  WardBedAllocation,
+  EmployeeLeaveRecord,
+  SupplyItem,
+  ManagerStats,
+  MedicalDomain
 } from '../types';
 
 export const MEDICAL_DOMAINS: MedicalDomain[] = [
@@ -136,33 +137,45 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
   }
 ];
 
-const DEFAULT_ADMISSIONS: InpatientAdmitRecord[] = [
-  { id: 'ADM-101', patientId: 'PT-90482', patientName: 'Robert Chen', age: 52, gender: 'Male', ward: 'Cardiac Step-Down', bedNumber: 'Bed 304-A', admitTime: '08:30 AM Today', diagnosis: 'Unstable Angina & High Troponin', attendingDoctor: 'Dr. Maya Lin', condition: 'Stable' },
-  { id: 'ADM-102', patientId: 'PT-60291', patientName: 'Maria Gonzalez', age: 71, gender: 'Female', ward: 'ICU North', bedNumber: 'ICU Bed 04', admitTime: '09:15 AM Today', diagnosis: 'Acute STEMI & Left Ventricular Failure', attendingDoctor: 'Dr. Maya Lin', condition: 'Critical (ICU)' },
-  { id: 'ADM-103', patientId: 'PT-77120', patientName: 'James Wilson', age: 48, gender: 'Male', ward: 'General Medicine', bedNumber: 'Bed 112', admitTime: '10:00 AM Today', diagnosis: 'Community Acquired Pneumonia', attendingDoctor: 'Dr. Arthur Sterling', condition: 'Under Observation' },
-  { id: 'ADM-104', patientId: 'PT-88319', patientName: 'Eleanor Vance', age: 64, gender: 'Female', ward: 'Cardiac Step-Down', bedNumber: 'Bed 305-B', admitTime: '11:00 AM Today', diagnosis: 'Post-Stent Coronary Telemetry', attendingDoctor: 'Dr. Maya Lin', condition: 'Stable' }
+const DEFAULT_EQUIPMENT: HospitalEquipment[] = [
+  { id: 'EQ-01', name: 'Siemens Magnetom 3.0T MRI', model: 'Skyra 3T Multi-Channel', department: 'Radiology & Imaging', location: 'Basement Imaging Wing B', status: 'Operational', lastServiced: 'Aug 14, 2026', nextServiceDue: 'Nov 14, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-02', name: 'GE Revolution 128-Slice CT Scanner', model: 'Revolution CT HD', department: 'Radiology & Trauma', location: 'Ground Floor Emergency Wing', status: 'Operational', lastServiced: 'Jul 28, 2026', nextServiceDue: 'Oct 28, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-03', name: 'Dräger Evita V800 ICU Ventilators (x24)', model: 'Evita Infinity V800', department: 'Critical Care ICU', location: 'ICU North & ICU South (3rd Floor)', status: 'Operational', lastServiced: 'Aug 02, 2026', nextServiceDue: 'Sep 02, 2026', technicianInCharge: 'Biomed. Nathan Drake' },
+  { id: 'EQ-04', name: 'Philips Azurion 7 Biplane Cath Lab', model: 'Azurion 7 C20', department: 'Cardiology OT', location: '2nd Floor OT Complex Suite 3', status: 'Operational', lastServiced: 'Aug 19, 2026', nextServiceDue: 'Nov 19, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-05', name: 'Fresenius 5008S Dialysis Units (x12)', model: 'Cordiax 5008S', department: 'Renal Dialysis Center', location: '1st Floor Dialysis Wing', status: 'Maintenance Due', lastServiced: 'Jun 10, 2026', nextServiceDue: 'Aug 25, 2026 (Overdue 7 days)', technicianInCharge: 'Biomed. Nathan Drake' },
+  { id: 'EQ-06', name: 'Stryker Mako Robotic Joint Arm', model: 'Mako Total Knee/Hip 3.2', department: 'Orthopedic Surgery', location: 'OT Suite 1 (Orthopedic)', status: 'Under Calibration', lastServiced: 'Aug 30, 2026', nextServiceDue: 'Sep 05, 2026 (Calibration in Progress)', technicianInCharge: 'Eng. Laura Kraft' }
 ];
 
-const DEFAULT_DISCHARGES: DischargeRecord[] = [
-  { id: 'DIS-201', patientId: 'PT-44019', patientName: 'Thomas Anderson', age: 59, ward: 'General Ward 2B', dischargeTime: '09:00 AM Today', doctorApproved: 'Dr. Arthur Sterling', summary: 'Full recovery from acute gastroenteritis and dehydration. Vitals normalized.' },
-  { id: 'DIS-202', patientId: 'PT-55102', patientName: 'Karen White', age: 42, ward: 'Orthopedic Recovery', dischargeTime: '10:30 AM Today', doctorApproved: 'Dr. Sarah Jenkins', summary: 'Post-arthroscopic knee repair recovery successful. Physiotherapy chart issued.' },
-  { id: 'DIS-203', patientId: 'PT-33910', patientName: 'Richard Roe', age: 67, ward: 'Cardiac Step-Down', dischargeTime: '11:45 AM Today', doctorApproved: 'Dr. Maya Lin', summary: 'Post-angioplasty 48-hour monitoring cleared. Cardiac rehab schedule provided.' }
+const DEFAULT_WARD_BEDS: WardBedAllocation[] = [
+  { id: 'WB-01', wardName: 'Intensive Care Unit (ICU North & South)', floor: 'Floor 3 (East Wing)', totalBeds: 30, occupiedBeds: 26, availableBeds: 4, headNurse: 'Sarah Connor, RN', ventilatorCount: 24 },
+  { id: 'WB-02', wardName: 'Cardiac Step-Down & Telemetry', floor: 'Floor 2 (Wing B)', totalBeds: 45, occupiedBeds: 38, availableBeds: 7, headNurse: 'Jessica Alba, RN', ventilatorCount: 6 },
+  { id: 'WB-03', wardName: 'Orthopedic & Post-Surgery Ward', floor: 'Floor 3 (Wing C)', totalBeds: 60, occupiedBeds: 52, availableBeds: 8, headNurse: 'Maria Rodriguez, RN', ventilatorCount: 4 },
+  { id: 'WB-04', wardName: 'General Medical Inpatient Ward', floor: 'Floor 1 (Wings A & B)', totalBeds: 150, occupiedBeds: 134, availableBeds: 16, headNurse: 'David Hernandez, RN', ventilatorCount: 8 },
+  { id: 'WB-05', wardName: 'Pediatrics & Neonatal NICU', floor: 'Floor 1 (Child Wing)', totalBeds: 40, occupiedBeds: 32, availableBeds: 8, headNurse: 'Amanda Clark, RN', ventilatorCount: 10 },
+  { id: 'WB-06', wardName: 'Maternity & Gynecology Recovery', floor: 'Floor 2 (Wing A)', totalBeds: 50, occupiedBeds: 41, availableBeds: 9, headNurse: 'Helen Hayes, RN', ventilatorCount: 2 },
+  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: 'Brian O\'Connor, RN', ventilatorCount: 12 },
+  { id: 'WB-08', wardName: 'Day Care Surgery & Chemotherapy', floor: 'Floor 4 (Center Wing)', totalBeds: 50, occupiedBeds: 43, availableBeds: 7, headNurse: 'Rachel Adams, RN', ventilatorCount: 2 }
 ];
 
-const DEFAULT_STAFF: StaffAttendanceRecord[] = [
-  { id: 'STF-01', name: 'Dr. Maya Lin, MD', role: 'Chief Cardiologist', department: 'Cardiology', status: 'ON_DUTY', shiftTime: '08:00 AM - 04:00 PM' },
-  { id: 'STF-02', name: 'Dr. David Kim, MD', role: 'Chief Neurologist', department: 'Neurology', status: 'ON_DUTY', shiftTime: '09:00 AM - 05:00 PM' },
-  { id: 'STF-03', name: 'Dr. Sarah Jenkins, MD', role: 'Orthopedic Surgeon', department: 'Orthopedics & OT', status: 'ON_DUTY', shiftTime: '08:30 AM - 04:30 PM (Operating Room)' },
-  { id: 'STF-04', name: 'Dr. Emily Watson, MD', role: 'Senior Pediatrician', department: 'Pediatrics', status: 'ON_DUTY', shiftTime: '08:00 AM - 04:00 PM' },
-  { id: 'STF-05', name: 'Dr. Rajesh Patel, MD', role: 'Medical Oncologist', department: 'Oncology', status: 'ON_DUTY', shiftTime: '10:00 AM - 06:00 PM' },
-  { id: 'STF-06', name: 'Dr. Marcus Reed, MD', role: 'Pulmonologist', department: 'Pulmonology', status: 'ON_LEAVE', leaveReason: 'Attending Medical Research Symposium', substituteCover: 'Dr. Arthur Sterling (MD)' },
-  { id: 'STF-07', name: 'Nurse Sarah Connor, RN', role: 'ICU Head Nurse', department: 'Critical Care ICU', status: 'ON_DUTY', shiftTime: '07:00 AM - 03:00 PM' },
-  { id: 'STF-08', name: 'Nurse Jessica Alba, RN', role: 'Cardiac Ward Lead Nurse', department: 'Cardiac Ward', status: 'ON_DUTY', shiftTime: '07:00 AM - 03:00 PM' },
-  { id: 'STF-09', name: 'Priya Nair', role: 'Front Desk Lead', department: 'Reception & Tokens', status: 'ON_DUTY', shiftTime: '08:00 AM - 05:00 PM' },
-  { id: 'STF-10', name: 'Dr. Kevin O\'Connor, MD', role: 'Nephrologist', department: 'Renal Dialysis', status: 'ON_LEAVE', leaveReason: 'Approved Personal Medical Leave', substituteCover: 'Dr. David Kim (On-Call)' }
+const DEFAULT_EMPLOYEE_LEAVES: EmployeeLeaveRecord[] = [
+  { id: 'LV-101', employeeName: 'Dr. Marcus Reed, MD', role: 'Senior Pulmonologist', department: 'Pulmonology', leaveType: 'Conference', startDate: 'Today', endDate: 'Sep 04, 2026', reason: 'Attending International Respiratory & Chest Medicine Symposium in Chicago', substituteCover: 'Dr. Arthur Sterling (On-Call)', approvalStatus: 'Approved' },
+  { id: 'LV-102', employeeName: 'Dr. Kevin O\'Connor, MD', role: 'Consultant Nephrologist', department: 'Renal Dialysis', leaveType: 'Medical', startDate: 'Today', endDate: 'Sep 03, 2026', reason: 'Post-dental surgery recovery and rest', substituteCover: 'Dr. David Kim (On-Call)', approvalStatus: 'Approved' },
+  { id: 'LV-103', employeeName: 'Nurse Jennifer Lopez, BSN', role: 'Senior OT Scrub Nurse', department: 'Operation Theatres', leaveType: 'Casual', startDate: 'Today', endDate: 'Today Evening', reason: 'Family medical emergency', substituteCover: 'Nurse Clara Oswald, RN', approvalStatus: 'Approved' },
+  { id: 'LV-104', employeeName: 'Robert Langdon', role: 'Biomedical Senior Technician', department: 'Biomedical Engineering', leaveType: 'Emergency', startDate: 'Sep 02, 2026', endDate: 'Sep 05, 2026', reason: 'Urgent family relocation matter', substituteCover: 'Biomed. Nathan Drake', approvalStatus: 'Pending Review' },
+  { id: 'LV-105', employeeName: 'Michael Chang', role: 'Head Pharmacist', department: 'Central Inpatient Pharmacy', leaveType: 'Casual', startDate: 'Sep 03, 2026', endDate: 'Sep 06, 2026', reason: 'Annual scheduled personal leave', substituteCover: 'Pharmacist Susan Miller', approvalStatus: 'Pending Review' }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v9';
+const DEFAULT_SUPPLIES: SupplyItem[] = [
+  { id: 'SUP-01', itemName: 'Liquid Medical Oxygen (Cryogenic Tank)', category: 'Gas & Power', currentStock: '96% Tank Capacity (12,000 Liters)', status: 'Optimal', reorderLevel: '40%' },
+  { id: 'SUP-02', itemName: 'Universal Blood Bank Units (O-Negative)', category: 'Blood Bank', currentStock: '28 Units (450ml Bags)', status: 'Adequate', reorderLevel: '10 Units' },
+  { id: 'SUP-03', itemName: 'Sterile Surgical Glove Packs (Size 7.5 & 8.0)', category: 'Surgical & Consumables', currentStock: '1,450 Pairs', status: 'Optimal', reorderLevel: '300 Pairs' },
+  { id: 'SUP-04', itemName: 'IV Normal Saline & Ringer Lactate (500ml)', category: 'Critical Medicine', currentStock: '820 Bottles', status: 'Optimal', reorderLevel: '200 Bottles' },
+  { id: 'SUP-05', itemName: 'Emergency ICU Antibiotics (Meropenem 1g)', category: 'Critical Medicine', currentStock: '95 Vials', status: 'Reorder Soon', reorderLevel: '80 Vials' },
+  { id: 'SUP-06', itemName: 'Dual Diesel Generator Backup Fuel', category: 'Gas & Power', currentStock: '100% Fuel Tank (72 Hours Continuous Backup)', status: 'Optimal', reorderLevel: '50%' }
+];
+
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v10';
+const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v1';
 
 function getApts(): Appointment[] {
   const saved = localStorage.getItem(STORAGE_KEY_APTS);
@@ -175,6 +188,20 @@ function getApts(): Appointment[] {
 
 function saveApts(list: Appointment[]) {
   localStorage.setItem(STORAGE_KEY_APTS, JSON.stringify(list));
+  window.dispatchEvent(new Event('medflow_live_update'));
+}
+
+function getLeaves(): EmployeeLeaveRecord[] {
+  const saved = localStorage.getItem(STORAGE_KEY_LEAVES);
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) {}
+  }
+  localStorage.setItem(STORAGE_KEY_LEAVES, JSON.stringify(DEFAULT_EMPLOYEE_LEAVES));
+  return DEFAULT_EMPLOYEE_LEAVES;
+}
+
+function saveLeaves(list: EmployeeLeaveRecord[]) {
+  localStorage.setItem(STORAGE_KEY_LEAVES, JSON.stringify(list));
   window.dispatchEvent(new Event('medflow_live_update'));
 }
 
@@ -273,43 +300,57 @@ export const api = {
     saveApts(updated);
   },
 
-  getAdmissionsToday: async (): Promise<InpatientAdmitRecord[]> => {
-    return DEFAULT_ADMISSIONS;
+  getEquipmentList: async (): Promise<HospitalEquipment[]> => {
+    return DEFAULT_EQUIPMENT;
   },
 
-  getDischargesToday: async (): Promise<DischargeRecord[]> => {
-    return DEFAULT_DISCHARGES;
+  getWardBeds: async (): Promise<WardBedAllocation[]> => {
+    return DEFAULT_WARD_BEDS;
   },
 
-  getStaffAttendance: async (): Promise<StaffAttendanceRecord[]> => {
-    return DEFAULT_STAFF;
+  getEmployeeLeaves: async (): Promise<EmployeeLeaveRecord[]> => {
+    return getLeaves();
   },
 
-  getMDStats: async (): Promise<MDStats> => {
-    const onDuty = DEFAULT_STAFF.filter(s => s.status === 'ON_DUTY').length;
-    const onLeave = DEFAULT_STAFF.filter(s => s.status === 'ON_LEAVE').length;
+  approveLeave: async (id: string): Promise<void> => {
+    const list = getLeaves();
+    const updated = list.map(l => l.id === id ? { ...l, approvalStatus: 'Approved' as const } : l);
+    saveLeaves(updated);
+  },
+
+  getSupplies: async (): Promise<SupplyItem[]> => {
+    return DEFAULT_SUPPLIES;
+  },
+
+  getManagerStats: async (): Promise<ManagerStats> => {
+    const leaves = getLeaves();
+    const activeLeavesCount = leaves.filter(l => l.approvalStatus === 'Approved').length;
+
+    let totalBeds = 0;
+    let occupiedBeds = 0;
+    DEFAULT_WARD_BEDS.forEach(w => {
+      totalBeds += w.totalBeds;
+      occupiedBeds += w.occupiedBeds;
+    });
+    const availableBeds = totalBeds - occupiedBeds;
+
+    const opCount = DEFAULT_EQUIPMENT.filter(e => e.status === 'Operational').length;
+    const serviceCount = DEFAULT_EQUIPMENT.filter(e => e.status !== 'Operational').length;
 
     return {
-      admittedTodayCount: DEFAULT_ADMISSIONS.length,
-      dischargedTodayCount: DEFAULT_DISCHARGES.length,
-      totalBeds: 450,
-      occupiedBeds: 394,
-      icuOccupancyPercent: 88.5,
-      activeSurgeriesCount: 4,
-      totalStaffCount: DEFAULT_STAFF.length,
-      staffOnDutyCount: onDuty,
-      staffOnLeaveCount: onLeave,
-      todayRevenueUsd: 28450,
-      revenueBreakdown: {
-        inpatientWardCharges: 14200,
-        opdConsultations: 3850,
-        surgeriesAndOT: 6200,
-        pharmacyDispensary: 2400,
-        labDiagnostics: 1800
-      },
-      bloodBankOveUnits: 28,
-      oxygenReservesPercent: 96,
-      erWaitTimeMinutes: 11
+      totalBeds,
+      occupiedBeds,
+      availableBeds,
+      bedOccupancyPercent: Math.round((occupiedBeds / totalBeds) * 1000) / 10,
+      totalEquipmentCount: DEFAULT_EQUIPMENT.length,
+      operationalEquipmentCount: opCount,
+      equipmentNeedsServiceCount: serviceCount,
+      totalEmployeesCount: 142,
+      employeesOnDutyCount: 142 - activeLeavesCount,
+      employeesOnLeaveCount: activeLeavesCount,
+      activeAmbulancesReady: 4,
+      oxygenLevelPercent: 96,
+      powerBackupStatus: '100% (Dual Diesel Gensets Standby)'
     };
   }
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
   Activity,
-  ShieldCheck,
+  Building2,
   CalendarCheck,
   User,
   ArrowRight
@@ -20,38 +20,39 @@ export const LoginPage: React.FC = () => {
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">MedFlow Healthcare Portals</h1>
           <p className="text-sm text-slate-600 mt-1 max-w-xl mx-auto">
-            St. Jude Medical Center • Select your authorized portal role to continue
+            St. Jude Medical Center • Select your authorized role to access the portal
           </p>
         </div>
 
-        {/* 3 Clean Persona Login Cards: MD, Receptionist, Patient */}
+        {/* 3 Clean Persona Login Cards: Manager, Receptionist, Patient */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left w-full">
-          {/* 1. MD (Hospital Owner) */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:border-amber-500 hover:shadow-md transition-all flex flex-col justify-between">
+          {/* 1. Manager (Hospital Operations & Facilities) */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:border-blue-500 hover:shadow-md transition-all flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex justify-between items-start">
-                <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center border border-amber-200">
-                  <ShieldCheck className="w-6 h-6" />
+                <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center border border-blue-200">
+                  <Building2 className="w-6 h-6" />
                 </div>
-                <span className="text-[10px] font-mono font-bold bg-amber-50 text-amber-900 px-2.5 py-0.5 rounded border border-amber-200 uppercase">
-                  MD (Owner)
+                <span className="text-[10px] font-mono font-bold bg-blue-50 text-blue-900 px-2.5 py-0.5 rounded border border-blue-200 uppercase">
+                  Manager
                 </span>
               </div>
               <div>
-                <h3 className="font-bold text-base text-slate-900">Hospital Owner & MD</h3>
-                <p className="text-xs text-amber-900 font-semibold mt-0.5">Dr. Arthur Sterling, MD</p>
+                <h3 className="font-bold text-base text-slate-900">Hospital Operations Manager</h3>
+                <p className="text-xs text-blue-900 font-semibold mt-0.5">Marcus Sterling, MHA</p>
               </div>
               <div className="pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-1.5">
-                <p>• Today's Admitted Inpatients (ICU & Wards)</p>
-                <p>• Discharged Recovered Patients</p>
-                <p>• 450 Bed Turnover & Doctor Duty Tracking</p>
+                <p>• Hospital Equipment & Biomedical Assets</p>
+                <p>• 450 Bed Inventory & 8 Ward Allocations</p>
+                <p>• Employee Leaves & Shift Duty Rostering</p>
+                <p>• Oxygen, Blood Bank & Supply Inventory</p>
               </div>
             </div>
             <button
-              onClick={() => switchUser('MD')}
+              onClick={() => switchUser('MANAGER')}
               className="mt-6 w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
             >
-              <span>Login as MD</span>
+              <span>Login as Hospital Manager</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
