@@ -3,28 +3,20 @@ import { HospitalUser, UserPersona } from '../types';
 
 export const HOSPITAL_USERS: HospitalUser[] = [
   {
-    id: 'u-director',
-    name: 'Dr. Arthur Sterling, MD',
-    email: 'director@stjudemedical.org',
-    persona: 'DIRECTOR',
-    role: 'Hospital Director & Medical Superintendent',
-    department: 'Executive Administration'
-  },
-  {
-    id: 'u-doctor',
-    name: 'Dr. Maya Lin, MD',
-    email: 'dr.mayalin@stjudemedical.org',
-    persona: 'DOCTOR',
-    role: 'Chief Cardiologist',
-    department: 'Department of Cardiology'
+    id: 'u-md',
+    name: 'Dr. Arthur Sterling',
+    email: 'md.owner@stjudemedical.org',
+    persona: 'MD',
+    role: 'MD (Hospital Owner & Managing Director)',
+    department: 'Hospital Management & Executive Board'
   },
   {
     id: 'u-receptionist',
     name: 'Priya Nair',
     email: 'reception@stjudemedical.org',
     persona: 'RECEPTIONIST',
-    role: 'Lead Patient Coordinator',
-    department: 'Central Registration & Appointments'
+    role: 'Receptionist (Appointments Desk)',
+    department: 'Central Registration & Token Desk'
   },
   {
     id: 'u-patient',

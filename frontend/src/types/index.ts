@@ -1,4 +1,4 @@
-export type UserPersona = 'DIRECTOR' | 'DOCTOR' | 'RECEPTIONIST' | 'PATIENT';
+export type UserPersona = 'MD' | 'RECEPTIONIST' | 'PATIENT';
 
 export type AppointmentStatus = 'Waiting' | 'Checked In' | 'Completed' | 'Rejected';
 
@@ -68,7 +68,7 @@ export interface DischargeRecord {
   summary: string;
 }
 
-export interface DirectorStats {
+export interface MDStats {
   admittedTodayCount: number;
   dischargedTodayCount: number;
   totalBeds: number;
