@@ -24,7 +24,9 @@ import {
   Zap,
   Droplet,
   Layers,
-  Wrench
+  Wrench,
+  XCircle,
+  X
 } from 'lucide-react';
 
 export const ManagerView: React.FC = () => {
@@ -34,6 +36,10 @@ export const ManagerView: React.FC = () => {
   const [leaveRecords, setLeaveRecords] = useState<EmployeeLeaveRecord[]>([]);
   const [supplies, setSupplies] = useState<SupplyItem[]>([]);
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'EQUIPMENT' | 'BEDS' | 'LEAVES' | 'SUPPLIES'>('OVERVIEW');
+
+  // Reject Leave Modal State
+  const [rejectingLeave, setRejectingLeave] = useState<EmployeeLeaveRecord | null>(null);
+  const [rejectReasonNote, setRejectReasonNote] = useState('Critical surgery / emergency trauma duty scheduled on this date.');
 
   const loadData = () => {
     api.getManagerStats().then(setStats);
@@ -50,8 +56,18 @@ export const ManagerView: React.FC = () => {
   }, []);
 
   const handleApproveLeave = async (id: string) => {
-    await api.approveLeave(id);
-    alert('Employee leave request approved successfully.');
+    await api.approveLeave(id, 'Approved. Substitute cover verified.');
+    alert('Employee leave request accepted and approved.');
+    loadData();
+  };
+
+  const handleConfirmRejectLeave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rejectingLeave) return;
+
+    await api.rejectLeave(rejectingLeave.id, rejectReasonNote);
+    setRejectingLeave(null);
+    alert(`Leave request for ${rejectingLeave.employeeName} rejected with reason.`);
     loadData();
   };
 
@@ -68,7 +84,7 @@ export const ManagerView: React.FC = () => {
               HOSPITAL MANAGEMENT CONTROL
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Medical Equipment, 450 Bed Turnovers, Employee Leaves, and Emergency Supply Readiness</p>
+          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Medical Equipment, 450 Bed Turnovers, Employee Leave Approvals/Rejections, and Emergency Supply Readiness</p>
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">
@@ -117,7 +133,7 @@ export const ManagerView: React.FC = () => {
             activeTab === 'LEAVES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>Employee Leaves & Rostering</span>
+          <span>Employee Leave Approvals / Rejections</span>
           <span className="text-[10px] font-mono bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded font-bold">
             {leaveRecords.filter(l => l.approvalStatus === 'Pending Review').length} Pending
           </span>
@@ -237,9 +253,9 @@ export const ManagerView: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Previews: Equipment Requiring Attention & Pending Leaves */}
+          {/* Quick Previews */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
-            {/* Equipment Requiring Service */}
+            {/* Equipment Alerts */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
@@ -274,10 +290,10 @@ export const ManagerView: React.FC = () => {
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
                   <CalendarCheck2 className="w-4 h-4 text-purple-700" />
-                  <h4 className="font-bold text-sm text-slate-900">Employee Leave Requests</h4>
+                  <h4 className="font-bold text-sm text-slate-900">Employee Leave Approvals / Rejections</h4>
                 </div>
                 <button onClick={() => setActiveTab('LEAVES')} className="text-xs font-bold text-purple-700 hover:underline cursor-pointer">
-                  Review All →
+                  Manage All Leaves →
                 </button>
               </div>
 
@@ -292,16 +308,27 @@ export const ManagerView: React.FC = () => {
                       <p className="text-[11px] text-slate-500 mt-0.5">{lv.reason} ({lv.startDate} - {lv.endDate})</p>
                       <p className="text-[10px] text-emerald-800 font-semibold">Cover: {lv.substituteCover}</p>
                     </div>
+
                     {lv.approvalStatus === 'Pending Review' ? (
-                      <button
-                        onClick={() => handleApproveLeave(lv.id)}
-                        className="bg-purple-700 hover:bg-purple-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs cursor-pointer"
-                      >
-                        Approve
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleApproveLeave(lv.id)}
+                          className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs cursor-pointer"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => setRejectingLeave(lv)}
+                          className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] px-2.5 py-1.5 rounded-lg cursor-pointer"
+                        >
+                          Reject
+                        </button>
+                      </div>
                     ) : (
-                      <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
-                        Approved
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                        lv.approvalStatus === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
+                      }`}>
+                        ● {lv.approvalStatus}
                       </span>
                     )}
                   </div>
@@ -416,13 +443,13 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 4: EMPLOYEE LEAVES & SHIFT ROSTERING */}
+      {/* TAB 4: EMPLOYEE LEAVES MANAGEMENT (ACCEPT OR REJECT) */}
       {activeTab === 'LEAVES' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
             <div>
-              <h3 className="font-bold text-base text-slate-900">Hospital Staff Leave Management & Duty Rostering</h3>
-              <p className="text-xs text-slate-500">Approve medical, casual, conference, and emergency leaves with substitute cover verification</p>
+              <h3 className="font-bold text-base text-slate-900">Hospital Staff Leave Management & Approvals/Rejections</h3>
+              <p className="text-xs text-slate-500">Accept or reject leave applications submitted by doctors, surgeons, nurses, and biomedical staff</p>
             </div>
             <span className="text-xs font-mono font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1 rounded-xl">
               142 Total Employees
@@ -431,7 +458,7 @@ export const ManagerView: React.FC = () => {
 
           <div className="space-y-3">
             {leaveRecords.map(lv => (
-              <div key={lv.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs">
+              <div key={lv.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-slate-900">{lv.employeeName}</span>
@@ -439,7 +466,7 @@ export const ManagerView: React.FC = () => {
                     <span className="text-[10px] font-mono bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-semibold">{lv.department}</span>
                   </div>
                   <p className="text-[11px] text-slate-600">
-                    <strong>Leave Type:</strong> {lv.leaveType} Leave • <strong>Duration:</strong> {lv.startDate} to {lv.endDate}
+                    <strong>Leave Type:</strong> {lv.leaveType} Leave • <strong>Duration:</strong> {lv.startDate} to {lv.endDate} (Applied: {lv.appliedDate})
                   </p>
                   <p className="text-[11px] text-slate-500">
                     <strong>Reason:</strong> {lv.reason}
@@ -447,9 +474,14 @@ export const ManagerView: React.FC = () => {
                   <p className="text-[11px] text-emerald-800 font-bold">
                     ✓ Verified Substitute Cover: {lv.substituteCover}
                   </p>
+                  {lv.managerNote && (
+                    <p className="text-[11px] text-slate-700 italic">
+                      Manager Decision Note: {lv.managerNote}
+                    </p>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   {lv.approvalStatus === 'Pending Review' ? (
                     <div className="flex items-center gap-2">
                       <button
@@ -457,12 +489,22 @@ export const ManagerView: React.FC = () => {
                         className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Approve Leave</span>
+                        <span>Accept Leave</span>
+                      </button>
+
+                      <button
+                        onClick={() => setRejectingLeave(lv)}
+                        className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Reject Leave</span>
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[11px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-xl">
-                      ✓ Approved by Manager
+                    <span className={`text-[11px] font-mono font-bold px-3 py-1.5 rounded-xl ${
+                      lv.approvalStatus === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
+                    }`}>
+                      ● {lv.approvalStatus === 'Approved' ? '✓ Accepted by Manager' : '✗ Rejected by Manager'}
                     </span>
                   )}
                 </div>
@@ -509,6 +551,60 @@ export const ManagerView: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reject Leave Reason Modal */}
+      {rejectingLeave && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-xs">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
+                <AlertTriangle className="w-4 h-4" />
+                <span>State Reason for Rejecting Staff Leave Request</span>
+              </div>
+              <button onClick={() => setRejectingLeave(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span className="font-mono font-bold text-[10px] text-slate-500">{rejectingLeave.id}</span>
+              <h4 className="font-bold text-slate-900">{rejectingLeave.employeeName} ({rejectingLeave.role})</h4>
+              <p className="text-slate-600">Leave Requested: {rejectingLeave.startDate} to {rejectingLeave.endDate}</p>
+              <p className="text-slate-500">Employee Reason: {rejectingLeave.reason}</p>
+            </div>
+
+            <form onSubmit={handleConfirmRejectLeave} className="space-y-3">
+              <div>
+                <label className="font-bold text-slate-800 block mb-1">Reason for Rejection (Visible to Employee) *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={rejectReasonNote}
+                  onChange={e => setRejectReasonNote(e.target.value)}
+                  placeholder="e.g. Critical surgery scheduled on this date, emergency on-call team shortage..."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none text-slate-900 font-medium"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setRejectingLeave(null)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-xl shadow-xs cursor-pointer"
+                >
+                  Confirm Rejection & Send to Employee
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -3,28 +3,24 @@ import { api } from '../services/api';
 import {
   SurgeryRecord,
   AttendanceDayRecord,
-  EmployeeLeaveRecord,
-  Appointment
+  EmployeeLeaveRecord
 } from '../types';
 import {
   Scissors,
   CalendarCheck,
   CalendarPlus,
-  Users,
   CheckCircle2,
   Clock,
-  Pill,
-  Award,
   Send,
-  AlertCircle
+  AlertCircle,
+  XCircle
 } from 'lucide-react';
 
 export const EmployeeView: React.FC = () => {
   const [surgeries, setSurgeries] = useState<SurgeryRecord[]>([]);
   const [attendanceLogs, setAttendanceLogs] = useState<AttendanceDayRecord[]>([]);
   const [leaveRecords, setLeaveRecords] = useState<EmployeeLeaveRecord[]>([]);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [activeTab, setActiveTab] = useState<'SURGERIES' | 'ATTENDANCE' | 'LEAVE' | 'PATIENTS'>('SURGERIES');
+  const [activeTab, setActiveTab] = useState<'SURGERIES' | 'ATTENDANCE' | 'LEAVE'>('SURGERIES');
 
   // Leave Application Form State
   const [leaveType, setLeaveType] = useState<'Medical' | 'Casual' | 'Emergency' | 'Conference'>('Casual');
@@ -34,15 +30,10 @@ export const EmployeeView: React.FC = () => {
   const [substituteCover, setSubstituteCover] = useState("Dr. Kevin O'Connor (On-Call)");
   const [isApplying, setIsApplying] = useState(false);
 
-  // Prescription Writer State for Assigned Patients
-  const [selectedAptId, setSelectedAptId] = useState<string | null>(null);
-  const [prescriptionText, setPrescriptionText] = useState('');
-
   const loadData = () => {
     api.getEmployeeSurgeries().then(setSurgeries);
     api.getEmployeeAttendance().then(setAttendanceLogs);
     api.getEmployeeLeaves().then(setLeaveRecords);
-    api.getAppointments().then(setAppointments);
   };
 
   useEffect(() => {
@@ -68,21 +59,15 @@ export const EmployeeView: React.FC = () => {
     });
     setIsApplying(false);
     setReason('');
-    alert('Leave application submitted successfully! Forwarded to Hospital Manager for approval.');
-    loadData();
-  };
-
-  const handleSavePrescription = async (aptId: string) => {
-    if (!prescriptionText.trim()) return;
-    await api.addPrescription(aptId, prescriptionText.trim());
-    setSelectedAptId(null);
-    setPrescriptionText('');
-    alert('Prescription and medical advice dispatched directly to patient health portal.');
+    alert('Leave application submitted successfully! Sent to Hospital Manager for Accept/Reject decision.');
     loadData();
   };
 
   const myLeaves = leaveRecords.filter(l => l.employeeName.includes('Sarah Jenkins'));
   const daysPresent = attendanceLogs.filter(a => a.status === 'Present').length;
+  const approvedLeaves = myLeaves.filter(l => l.approvalStatus === 'Approved').length;
+  const rejectedLeaves = myLeaves.filter(l => l.approvalStatus === 'Rejected').length;
+  const pendingLeaves = myLeaves.filter(l => l.approvalStatus === 'Pending Review').length;
 
   return (
     <div className="space-y-6 font-sans w-full">
@@ -91,7 +76,7 @@ export const EmployeeView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900">Dr. Sarah Jenkins, MD — Staff & Surgeon Portal</h1>
-            <span className="text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-0.5 rounded font-mono">
+            <span className="text-[10px] font-bold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-0.5 rounded font-mono">
               EMPLOYEE ID: EMP-8024
             </span>
           </div>
@@ -102,64 +87,56 @@ export const EmployeeView: React.FC = () => {
 
         <div className="flex items-center gap-3 text-xs font-mono">
           <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-right">
-            <span className="text-[10px] text-emerald-800 font-semibold block">CURRENT SHIFT STATUS</span>
-            <span className="text-base font-black text-emerald-950">● Active in OT Suite 1</span>
+            <span className="text-[10px] text-emerald-800 font-semibold block">TODAY'S SHIFT TIME</span>
+            <span className="text-base font-black text-emerald-950">08:00 AM - 04:30 PM (OT Suite 1)</span>
           </div>
         </div>
       </div>
 
-      {/* Top 4 Performance & Attendance KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-xs w-full">
-        {/* 1. Days Attended (Yenni Days Vachadu) */}
+      {/* Top 3 KPI Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-xs w-full">
+        {/* 1. Days Attended & Shift Time (Yenni Days Vachadu) */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Monthly Duty Attendance</span>
+            <span className="font-semibold">Duty Attendance & Days Present</span>
             <div className="p-2 bg-blue-50 text-blue-700 rounded-xl">
               <CalendarCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-black text-blue-900">{daysPresent} Days Present</div>
-          <p className="text-[11px] text-emerald-700 font-bold">92.3% Punctuality Score (0 Unexcused)</p>
+          <p className="text-[11px] text-slate-600 font-medium">Shift: <strong>08:00 AM - 04:30 PM</strong> (Biometric Verified)</p>
         </div>
 
-        {/* 2. Surgeries Completed (Yenni Operations Chesadu) */}
+        {/* 2. Operations / Surgeries Performed (Yenni Operations Chesadu) */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Surgeries Completed</span>
+            <span className="font-semibold">Operations / Surgeries Performed</span>
             <div className="p-2 bg-purple-50 text-purple-700 rounded-xl">
               <Scissors className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-black text-purple-950">{surgeries.length} Major Operations</div>
-          <p className="text-[11px] text-purple-800 font-medium">100% Success & Zero Complication Rate</p>
+          <p className="text-[11px] text-emerald-700 font-bold">100% Successful Recovery & Zero Complications</p>
         </div>
 
-        {/* 3. Leave Balance & Status */}
+        {/* 3. Leave Requests Summary (Yenni Leaves Petadu) */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Leave Balance Remaining</span>
+            <span className="font-semibold">Leave Applications Summary</span>
             <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
               <CalendarPlus className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">18 Annual Days</div>
-          <p className="text-[11px] text-amber-800 font-medium">{myLeaves.length} Applications on Record</p>
-        </div>
-
-        {/* 4. Daily Assigned Patient Queue */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Assigned Patient Queue</span>
-            <div className="p-2 bg-teal-50 text-teal-700 rounded-xl">
-              <Users className="w-4 h-4" />
-            </div>
+          <div className="text-2xl font-black text-slate-900">{myLeaves.length} Total Leaves Applied</div>
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold pt-0.5">
+            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">{approvedLeaves} Accepted</span>
+            <span className="text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200">{rejectedLeaves} Rejected</span>
+            <span className="text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">{pendingLeaves} Pending</span>
           </div>
-          <div className="text-2xl font-black text-teal-950">{appointments.length} Consultations</div>
-          <p className="text-[11px] text-teal-800 font-medium">OPD & Post-Op Review Queue</p>
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs */}
+      {/* 3 Navigation Sub-Tabs */}
       <div className="flex flex-wrap gap-2 p-1.5 bg-slate-200/70 rounded-xl text-xs font-semibold w-full">
         <button
           onClick={() => setActiveTab('SURGERIES')}
@@ -178,7 +155,7 @@ export const EmployeeView: React.FC = () => {
           }`}
         >
           <CalendarCheck className="w-3.5 h-3.5 text-blue-700" />
-          <span>Attendance & Shift Logs ({daysPresent} Days)</span>
+          <span>Duty Date & Shift Time Records ({daysPresent} Days)</span>
         </button>
 
         <button
@@ -188,27 +165,17 @@ export const EmployeeView: React.FC = () => {
           }`}
         >
           <CalendarPlus className="w-3.5 h-3.5 text-amber-700" />
-          <span>Apply for Leave & Status</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('PATIENTS')}
-          className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'PATIENTS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
-          }`}
-        >
-          <Users className="w-3.5 h-3.5 text-teal-700" />
-          <span>Assigned Patients & Write Prescription</span>
+          <span>Apply for Leave & Live Status ({myLeaves.length} Applications)</span>
         </button>
       </div>
 
-      {/* TAB 1: OPERATIONS & SURGERIES PERFORMED (YENNI OPERATIONS CHESADO) */}
+      {/* TAB 1: OPERATIONS & SURGERIES PERFORMED */}
       {activeTab === 'SURGERIES' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
             <div>
               <h3 className="font-bold text-base text-slate-900">Surgical Operations Log & Clinical Outcomes</h3>
-              <p className="text-xs text-slate-500">Comprehensive register of all surgical procedures, robot-assisted arthroplasties, and patient recovery</p>
+              <p className="text-xs text-slate-500">Full record of all surgical procedures, robot-assisted arthroplasties, and patient recovery</p>
             </div>
             <span className="text-xs font-mono font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1 rounded-xl">
               Lead Surgeon Portfolio
@@ -252,12 +219,12 @@ export const EmployeeView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: ATTENDANCE & SHIFT LOGS (YENNI DAYS VACHADU) */}
+      {/* TAB 2: DUTY DATE & SHIFT TIME RECORDS */}
       {activeTab === 'ATTENDANCE' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
             <div>
-              <h3 className="font-bold text-base text-slate-900">Monthly Duty Attendance & Shift Punch Records</h3>
+              <h3 className="font-bold text-base text-slate-900">Duty Dates, Shift Timing & Biometric Punch Records</h3>
               <p className="text-xs text-slate-500">Verified biometric punch-in records, shift schedules, and hours logged at St. Jude Medical Center</p>
             </div>
             <span className="text-xs font-mono font-bold bg-blue-50 text-blue-900 border border-blue-200 px-3 py-1 rounded-xl">
@@ -273,7 +240,7 @@ export const EmployeeView: React.FC = () => {
                     <span className="font-bold text-slate-900">{log.date}</span>
                     <span className="text-[10px] font-mono bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-semibold">{log.day}</span>
                   </div>
-                  <p className="text-[11px] text-slate-600 font-medium">{log.shift}</p>
+                  <p className="text-[11px] text-slate-700 font-semibold">{log.shift}</p>
                   <p className="text-[10px] text-slate-400 font-mono">Location: {log.departmentFloor}</p>
                 </div>
 
@@ -295,41 +262,39 @@ export const EmployeeView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: APPLY FOR LEAVE & LEAVE STATUS (LEAVE APPLY CHESUKOVADANIKI) */}
+      {/* TAB 3: APPLY FOR LEAVE & LEAVE STATUS (ACCEPT / REJECT WITH MANAGER REASON) */}
       {activeTab === 'LEAVE' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
           {/* Left: Apply for Leave Form */}
-          <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-base text-slate-900">Apply for Official Staff Leave</h3>
-              <p className="text-xs text-slate-500">Submit leave request for approval by Hospital Operations Manager</p>
+              <h3 className="font-bold text-base text-slate-900">Apply for Official Leave</h3>
+              <p className="text-xs text-slate-500">Submit leave request for Manager review & approval</p>
             </div>
 
             <form onSubmit={handleApplyLeave} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Leave Category *</label>
-                  <select
-                    value={leaveType}
-                    onChange={e => setLeaveType(e.target.value as any)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium"
-                  >
-                    <option value="Casual">Casual Leave</option>
-                    <option value="Medical">Medical / Sick Leave</option>
-                    <option value="Emergency">Emergency Family Leave</option>
-                    <option value="Conference">Medical Conference / CME</option>
-                  </select>
-                </div>
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Leave Category *</label>
+                <select
+                  value={leaveType}
+                  onChange={e => setLeaveType(e.target.value as any)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium"
+                >
+                  <option value="Casual">Casual Leave</option>
+                  <option value="Medical">Medical / Sick Leave</option>
+                  <option value="Emergency">Emergency Family Leave</option>
+                  <option value="Conference">Medical Conference / CME</option>
+                </select>
+              </div>
 
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Nominated Substitute Cover *</label>
-                  <input
-                    required
-                    value={substituteCover}
-                    onChange={e => setSubstituteCover(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
-                  />
-                </div>
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Nominated Substitute / On-Call Doctor *</label>
+                <input
+                  required
+                  value={substituteCover}
+                  onChange={e => setSubstituteCover(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -377,129 +342,71 @@ export const EmployeeView: React.FC = () => {
             </form>
           </div>
 
-          {/* Right: My Leave History & Manager Status */}
-          <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-base text-slate-900">My Leave Applications & Manager Approval</h3>
-              <p className="text-xs text-slate-500">Live status of your submitted leave requests</p>
+          {/* Right: My Leave Applications History with Accept / Reject Badges */}
+          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
+              <div>
+                <h3 className="font-bold text-base text-slate-900">My Leave Applications ({myLeaves.length})</h3>
+                <p className="text-xs text-slate-500">Live decision status from Hospital Manager (Marcus Sterling)</p>
+              </div>
+              <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">
+                Synced with Manager
+              </span>
             </div>
 
             <div className="space-y-3">
               {myLeaves.map(lv => (
-                <div key={lv.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                <div
+                  key={lv.id}
+                  className={`p-4 rounded-2xl border space-y-2.5 text-xs ${
+                    lv.approvalStatus === 'Approved'
+                      ? 'bg-emerald-50/40 border-emerald-200'
+                      : lv.approvalStatus === 'Rejected'
+                      ? 'bg-rose-50/40 border-rose-200'
+                      : 'bg-amber-50/40 border-amber-200'
+                  }`}
+                >
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="font-mono font-bold text-[10px] text-slate-400">{lv.id} • {lv.appliedDate}</span>
+                      <span className="font-mono font-bold text-[10px] text-slate-500">{lv.id} • Applied {lv.appliedDate}</span>
                       <h4 className="font-bold text-slate-900 text-sm mt-0.5">{lv.leaveType} Leave ({lv.startDate} - {lv.endDate})</h4>
                     </div>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl ${
-                      lv.approvalStatus === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200 animate-pulse'
+
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
+                      lv.approvalStatus === 'Approved'
+                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                        : lv.approvalStatus === 'Rejected'
+                        ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                        : 'bg-amber-100 text-amber-900 border border-amber-300 animate-pulse'
                     }`}>
-                      ● {lv.approvalStatus}
+                      ● {lv.approvalStatus === 'Approved' ? '✓ Accepted by Manager' : lv.approvalStatus === 'Rejected' ? '✗ Rejected by Manager' : '⏳ Pending Review'}
                     </span>
                   </div>
 
-                  <p className="text-slate-600 text-[11px]">
-                    <strong>Reason:</strong> {lv.reason}
+                  <p className="text-slate-700 text-[11px]">
+                    <strong>Stated Reason:</strong> {lv.reason}
                   </p>
 
-                  <div className="pt-2 border-t border-slate-200/60 flex justify-between items-center text-[10px] font-mono">
-                    <span className="text-emerald-800 font-bold">Cover: {lv.substituteCover}</span>
-                    <span className="text-slate-400">Decision by Manager: Marcus Sterling</span>
+                  {/* Manager Response Note */}
+                  {lv.managerNote && (
+                    <div className={`p-2.5 rounded-xl border text-[11px] ${
+                      lv.approvalStatus === 'Approved'
+                        ? 'bg-white border-emerald-200 text-emerald-950'
+                        : lv.approvalStatus === 'Rejected'
+                        ? 'bg-white border-rose-200 text-rose-950 font-semibold'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}>
+                      <strong>Manager Note:</strong> {lv.managerNote}
+                    </div>
+                  )}
+
+                  <div className="pt-1.5 border-t border-slate-200/60 flex justify-between items-center text-[10px] font-mono text-slate-500">
+                    <span>Verified Substitute: <strong>{lv.substituteCover}</strong></span>
+                    <span>Reviewer: Marcus Sterling (Manager)</span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: ASSIGNED PATIENTS & WRITE PRESCRIPTION */}
-      {activeTab === 'PATIENTS' && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-            <div>
-              <h3 className="font-bold text-base text-slate-900">My Consultation Queue & Patient Orders</h3>
-              <p className="text-xs text-slate-500">Review patient symptoms, mark consultations completed, and issue prescriptions</p>
-            </div>
-            <span className="text-xs font-mono font-bold bg-teal-50 text-teal-900 border border-teal-200 px-3 py-1 rounded-xl">
-              Orthopedic Specialist Queue
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {appointments.map(a => (
-              <div key={a.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-[10px] bg-slate-200 text-slate-800 px-2.5 py-0.5 rounded">
-                        TOKEN {a.tokenNumber}
-                      </span>
-                      <span className="text-[10px] font-mono bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-semibold">
-                        {a.timeSlot}
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-sm text-slate-900 mt-1">{a.patientName} ({a.patientAge}y, {a.patientGender})</h4>
-                    <p className="text-slate-500 text-[11px]">Phone: {a.patientPhone} • Complaint: <strong>{a.symptoms}</strong></p>
-                  </div>
-
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl ${
-                    a.status === 'Completed' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-blue-50 text-blue-800 border border-blue-200'
-                  }`}>
-                    ● {a.status}
-                  </span>
-                </div>
-
-                {/* Prescription Box */}
-                {a.prescription ? (
-                  <div className="p-3.5 bg-blue-50/80 rounded-xl border border-blue-200 space-y-1 text-xs">
-                    <div className="flex items-center gap-1.5 font-bold text-blue-950">
-                      <Pill className="w-3.5 h-3.5 text-blue-700" />
-                      <span>Issued Prescription:</span>
-                    </div>
-                    <p className="text-slate-800 font-medium leading-relaxed">{a.prescription}</p>
-                  </div>
-                ) : (
-                  <div>
-                    {selectedAptId === a.id ? (
-                      <div className="space-y-2 pt-2 border-t border-slate-200">
-                        <label className="font-bold text-slate-800 block">Write Prescription & Advice for {a.patientName}:</label>
-                        <textarea
-                          rows={2}
-                          value={prescriptionText}
-                          onChange={e => setPrescriptionText(e.target.value)}
-                          placeholder="e.g. Tab. Aceclofenac 100mg twice daily, ice compression, review in 7 days..."
-                          className="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none text-xs"
-                        />
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedAptId(null)}
-                            className="px-3 py-1.5 text-slate-600 hover:bg-slate-200 rounded-lg font-semibold"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleSavePrescription(a.id)}
-                            className="px-4 py-1.5 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg shadow-xs"
-                          >
-                            Save & Send Prescription to Patient
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => { setSelectedAptId(a.id); setPrescriptionText(''); }}
-                        className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] px-3.5 py-1.5 rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
-                      >
-                        <Pill className="w-3.5 h-3.5" />
-                        <span>Write Prescription</span>
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
           </div>
         </div>
       )}
