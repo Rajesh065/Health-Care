@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api, MEDICAL_DOMAINS } from '../services/api';
 import { AppointmentType } from '../types';
 import {
@@ -19,7 +19,7 @@ export const BookAppointmentModal: React.FC<{
   initialMode?: AppointmentType;
   onClose: () => void;
   onSuccess: () => void;
-}> = ({ isOpen, initialMode = 'SPECIALIST_CONSULTATION', onClose, onSuccess }) => {
+}> = ({ isOpen, initialMode = 'GENERAL_OPD', onClose, onSuccess }) => {
   const [bookingMode, setBookingMode] = useState<AppointmentType>(initialMode);
 
   // Common Patient Fields
@@ -34,6 +34,12 @@ export const BookAppointmentModal: React.FC<{
   // Specialist Domain Selection
   const [selectedDomainId, setSelectedDomainId] = useState<string>('cardio');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialMode) {
+      setBookingMode(initialMode);
+    }
+  }, [initialMode, isOpen]);
 
   if (!isOpen) return null;
 
