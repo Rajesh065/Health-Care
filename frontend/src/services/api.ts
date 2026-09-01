@@ -2,7 +2,7 @@ import {
   Appointment,
   InpatientAdmitRecord,
   DischargeRecord,
-  DirectorStats,
+  MDStats,
   MedicalDomain
 } from '../types';
 
@@ -81,7 +81,7 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
   }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v6';
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v7';
 
 const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
@@ -267,7 +267,7 @@ export const api = {
     return DEFAULT_DISCHARGES;
   },
 
-  getDirectorStats: async (): Promise<DirectorStats> => {
+  getMDStats: async (): Promise<MDStats> => {
     return {
       admittedTodayCount: DEFAULT_ADMISSIONS.length,
       dischargedTodayCount: DEFAULT_DISCHARGES.length,

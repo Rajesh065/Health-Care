@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
-import { DirectorStats, InpatientAdmitRecord, DischargeRecord, Appointment } from '../types';
+import { MDStats, InpatientAdmitRecord, DischargeRecord, Appointment } from '../types';
 import {
   Bed,
   Users,
@@ -13,14 +13,14 @@ import {
   Clock
 } from 'lucide-react';
 
-export const DirectorView: React.FC = () => {
-  const [stats, setStats] = useState<DirectorStats | null>(null);
+export const MDView: React.FC = () => {
+  const [stats, setStats] = useState<MDStats | null>(null);
   const [admissions, setAdmissions] = useState<InpatientAdmitRecord[]>([]);
   const [discharges, setDischarges] = useState<DischargeRecord[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const loadData = () => {
-    api.getDirectorStats().then(setStats);
+    api.getMDStats().then(setStats);
     api.getAdmissionsToday().then(setAdmissions);
     api.getDischargesToday().then(setDischarges);
     api.getAppointments().then(setAppointments);
@@ -35,34 +35,34 @@ export const DirectorView: React.FC = () => {
   if (!stats) return null;
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Header Overview */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-6 font-sans w-full">
+      {/* MD Header Overview */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Dr. Arthur Sterling — Hospital Executive Command</h1>
-            <span className="text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded font-mono">
-              DIRECTOR OVERSIGHT
+            <h1 className="text-xl font-bold text-slate-900">Dr. Arthur Sterling, MD — Hospital Executive Dashboard</h1>
+            <span className="text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded font-mono">
+              MD (OWNER OVERSIGHT)
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Bed Turnover, Patient Inflow/Outflow & Clinical Operations</p>
+          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Bed Inflow, Discharges, and Clinical Operations</p>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 block">ACTIVE DOCTORS ON DUTY</span>
-            <span className="text-base font-black text-slate-900">{stats.doctorsOnDuty} Specialists</span>
+            <span className="text-[10px] text-slate-400 block">ACTIVE ON-DUTY SPECIALISTS</span>
+            <span className="text-base font-black text-slate-900">{stats.doctorsOnDuty} Doctors Active</span>
           </div>
         </div>
       </div>
 
-      {/* 4 Key Executive Metrics (Admissions, Discharges, Beds, Doctors) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+      {/* 4 Key Executive Metrics (Admissions, Discharges, Beds, Total Consultations) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-xs w-full">
         {/* 1. Admissions Today */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-1">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
             <span className="font-semibold">Admitted Patients Today</span>
-            <div className="p-1.5 bg-blue-50 text-blue-700 rounded-lg">
+            <div className="p-2 bg-blue-50 text-blue-700 rounded-xl">
               <UserPlus className="w-4 h-4" />
             </div>
           </div>
@@ -71,10 +71,10 @@ export const DirectorView: React.FC = () => {
         </div>
 
         {/* 2. Discharges Today */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-1">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
             <span className="font-semibold">Discharged Patients Today</span>
-            <div className="p-1.5 bg-emerald-50 text-emerald-700 rounded-lg">
+            <div className="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
               <UserMinus className="w-4 h-4" />
             </div>
           </div>
@@ -83,10 +83,10 @@ export const DirectorView: React.FC = () => {
         </div>
 
         {/* 3. Bed Capacity */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-1">
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
             <span className="font-semibold">Current Bed Occupancy</span>
-            <div className="p-1.5 bg-amber-50 text-amber-700 rounded-lg">
+            <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
               <Bed className="w-4 h-4" />
             </div>
           </div>
@@ -94,11 +94,11 @@ export const DirectorView: React.FC = () => {
           <p className="text-[11px] text-emerald-700 font-bold">56 Beds Available (87.5% Load)</p>
         </div>
 
-        {/* 4. Doctors Shift Coverage */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-1">
+        {/* 4. Consultations Today */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Consultations Today</span>
-            <div className="p-1.5 bg-purple-50 text-purple-700 rounded-lg">
+            <span className="font-semibold">Today's Total Appointments</span>
+            <div className="p-2 bg-purple-50 text-purple-700 rounded-xl">
               <Users className="w-4 h-4" />
             </div>
           </div>
@@ -107,11 +107,11 @@ export const DirectorView: React.FC = () => {
         </div>
       </div>
 
-      {/* 2-Column: Admitted Today List vs Discharged Today List */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {/* 2-Column: Admitted Today List vs Discharged Today List (Expansive Width) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
         {/* Left: Admitted Today List */}
-        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
+        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3.5">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <UserPlus className="w-4 h-4 text-blue-700" />
               <h3 className="font-bold text-sm text-slate-900">Today's Inpatient Admissions ({admissions.length})</h3>
@@ -121,9 +121,9 @@ export const DirectorView: React.FC = () => {
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {admissions.map(adm => (
-              <div key={adm.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+              <div key={adm.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="font-mono font-bold text-[10px] text-slate-500">{adm.patientId} • {adm.ward} ({adm.bedNumber})</span>
@@ -146,8 +146,8 @@ export const DirectorView: React.FC = () => {
         </div>
 
         {/* Right: Discharged Today List */}
-        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
+        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3.5">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <UserMinus className="w-4 h-4 text-emerald-700" />
               <h3 className="font-bold text-sm text-slate-900">Today's Discharged Patients ({discharges.length})</h3>
@@ -157,9 +157,9 @@ export const DirectorView: React.FC = () => {
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {discharges.map(dis => (
-              <div key={dis.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+              <div key={dis.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="font-mono font-bold text-[10px] text-slate-500">{dis.patientId} • From {dis.ward}</span>

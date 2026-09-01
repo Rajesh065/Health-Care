@@ -3,8 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { BookAppointmentModal } from './components/BookAppointmentModal';
 import { LoginPage } from './pages/LoginPage';
-import { DirectorView } from './pages/DirectorView';
-import { DoctorView } from './pages/DoctorView';
+import { MDView } from './pages/MDView';
 import { ReceptionView } from './pages/ReceptionView';
 import { PatientView } from './pages/PatientView';
 import { AppointmentType } from './types';
@@ -29,12 +28,11 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans w-full">
       <Navbar onBookClick={handleOpenSpecialist} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        {persona === 'DIRECTOR' && <DirectorView />}
-        {persona === 'DOCTOR' && <DoctorView />}
+      <main className="flex-1 w-full px-4 sm:px-8 lg:px-12 py-6">
+        {persona === 'MD' && <MDView />}
         {persona === 'RECEPTIONIST' && <ReceptionView onNewBooking={handleOpenGeneral} />}
         {persona === 'PATIENT' && (
           <PatientView

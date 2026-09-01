@@ -46,7 +46,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
     await api.updateStatus(rejectingApt.id, 'Rejected', fullReason);
     setRejectingApt(null);
     setCustomReasonNote('');
-    alert(`Appointment token ${rejectingApt.tokenNumber} rejected with clear reason. Sent SMS & portal message to patient.`);
+    alert(`Appointment token ${rejectingApt.tokenNumber} rejected with clear reason.`);
   };
 
   const filtered = appointments.filter(a => {
@@ -58,17 +58,17 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
   });
 
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-6 font-sans w-full">
       {/* Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-base text-slate-900">Front Desk & Outpatient Token Queue</h2>
-            <span className="text-[10px] font-bold bg-teal-50 text-teal-900 border border-teal-200 px-2 py-0.5 rounded font-mono">
-              PRIYA NAIR (RECEPTION LEAD)
+            <h2 className="font-bold text-base text-slate-900">Receptionist — Appointments Desk</h2>
+            <span className="text-[10px] font-bold bg-teal-50 text-teal-900 border border-teal-200 px-2.5 py-0.5 rounded font-mono">
+              PRIYA NAIR (RECEPTIONIST)
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Manage patient check-ins, chamber dispatch, and reject overbooked tokens with clear reasons</p>
+          <p className="text-xs text-slate-500 mt-0.5">Accept and check-in patient tokens, or reject overbooked slots with clear explanation</p>
         </div>
 
         <button
@@ -81,7 +81,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 text-xs w-full">
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setFilter('ALL')}
@@ -131,19 +131,13 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
       </div>
 
       {/* Appointment Tokens List */}
-      <div className="space-y-3">
+      <div className="space-y-3 w-full">
         {filtered.map(a => (
           <div
             key={a.id}
-            className={`p-4 rounded-2xl border transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs ${
-              a.status === 'Rejected'
-                ? 'bg-rose-50/40 border-rose-200'
-                : a.status === 'Completed'
-                ? 'bg-slate-50/60 border-slate-200'
-                : 'bg-white border-slate-200 shadow-xs'
-            }`}
+            className="p-5 rounded-2xl border transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs bg-white border-slate-200 shadow-xs w-full"
           >
-            <div className="flex items-start sm:items-center gap-3.5">
+            <div className="flex items-start sm:items-center gap-4">
               <div className={`w-12 h-12 rounded-2xl text-white flex items-center justify-center font-mono font-black text-sm shrink-0 shadow-xs ${
                 a.status === 'Rejected' ? 'bg-rose-800' :
                 a.status === 'Completed' ? 'bg-emerald-800' :
@@ -164,10 +158,9 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                   <strong>Complaint:</strong> {a.symptoms}
                 </p>
                 {a.rejectionReason && (
-                  <div className="p-2 bg-rose-100/70 rounded-lg border border-rose-200 text-rose-900 mt-1">
-                    <span className="font-bold block text-[11px]">Rejection Reason Sent to Patient:</span>
-                    <p className="text-[11px] text-rose-800 mt-0.5">{a.rejectionReason}</p>
-                  </div>
+                  <p className="text-[11px] text-rose-600 font-bold mt-1">
+                    Rejection Reason: {a.rejectionReason}
+                  </p>
                 )}
               </div>
             </div>
@@ -179,7 +172,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                   : a.status === 'Checked In'
                   ? 'bg-blue-50 text-blue-800 border border-blue-200 animate-pulse'
                   : a.status === 'Rejected'
-                  ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
                   : 'bg-amber-50 text-amber-800 border border-amber-200'
               }`}>
                 ● {a.status}
@@ -192,16 +185,15 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                     className="bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Check-In</span>
+                    <span>Accept & Check-In</span>
                   </button>
 
-                  {/* Reject / Cancel Button */}
                   <button
                     onClick={() => setRejectingApt(a)}
                     className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <XCircle className="w-3.5 h-3.5" />
-                    <span>Reject with Reason</span>
+                    <span>Reject</span>
                   </button>
                 </div>
               )}
@@ -210,14 +202,14 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
         ))}
       </div>
 
-      {/* Enhanced Reject Appointment Modal with Clear Humanized Reason Input */}
+      {/* Reject Modal */}
       {rejectingApt && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-xs">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
                 <AlertTriangle className="w-4 h-4" />
-                <span>State Reason for Rejecting Patient Appointment</span>
+                <span>State Reason for Rejecting Appointment</span>
               </div>
               <button onClick={() => setRejectingApt(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
                 <X className="w-4 h-4" />
@@ -227,47 +219,35 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <span className="font-mono font-bold text-[10px] text-slate-500">{rejectingApt.tokenNumber}</span>
               <h4 className="font-bold text-slate-900">{rejectingApt.patientName} ({rejectingApt.timeSlot})</h4>
-              <p className="text-slate-600">Assigned Doctor: {rejectingApt.doctorName} ({rejectingApt.department})</p>
+              <p className="text-slate-600">Doctor: {rejectingApt.doctorName} ({rejectingApt.department})</p>
             </div>
 
             <form onSubmit={handleConfirmReject} className="space-y-3">
               <div>
-                <label className="font-bold text-slate-800 block mb-1">Primary Reason for Rejection *</label>
+                <label className="font-bold text-slate-800 block mb-1">Primary Reason *</label>
                 <select
                   value={selectedPresetReason}
                   onChange={e => setSelectedPresetReason(e.target.value)}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium"
                 >
-                  <option value="Doctor Called for Emergency Open-Heart / Brain Surgery">Doctor Called for Emergency Surgery (Chamber Suspended)</option>
-                  <option value="Consultation Slot Fully Booked (Maximum Daily Patient Capacity Reached)">Consultation Slot Fully Booked (Maximum Daily Patient Capacity Reached)</option>
-                  <option value="Specialist Physician on Emergency Medical Leave Today">Specialist Physician on Emergency Medical Leave Today</option>
-                  <option value="Patient Requested Appointment Cancellation / Date Reschedule">Patient Requested Appointment Cancellation / Date Reschedule</option>
-                  <option value="Patient No-Show for Scheduled Consultation Slot">Patient No-Show for Scheduled Consultation Slot</option>
-                  <option value="Other Specific Operational Reason">Other Specific Operational Reason (Enter below)</option>
+                  <option value="Doctor in Emergency Surgery (Chamber Suspended)">Doctor in Emergency Surgery (Chamber Suspended)</option>
+                  <option value="Consultation Slot Fully Booked (Overcapacity)">Consultation Slot Fully Booked (Overcapacity)</option>
+                  <option value="Specialist Physician on Emergency Leave Today">Specialist Physician on Emergency Leave Today</option>
+                  <option value="Patient Requested Reschedule">Patient Requested Reschedule</option>
+                  <option value="Patient No-Show for Assigned Slot">Patient No-Show for Assigned Slot</option>
+                  <option value="Other Operational Reason">Other Operational Reason</option>
                 </select>
               </div>
 
               <div>
-                <label className="font-bold text-slate-800 block mb-1">
-                  Additional Details / Message for Patient (Optional)
-                </label>
+                <label className="font-bold text-slate-800 block mb-1">Additional Message for Patient (Optional)</label>
                 <textarea
                   rows={2}
                   value={customReasonNote}
                   onChange={e => setCustomReasonNote(e.target.value)}
-                  placeholder="e.g. Dr. Maya Lin is performing an emergency cardiac bypass until 4 PM. Please choose tomorrow's morning slot or visit ER if critical..."
+                  placeholder="Type additional details for patient..."
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none text-slate-900"
                 />
-              </div>
-
-              {/* Message Preview */}
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1">
-                <span className="font-bold text-rose-950 block text-[10px] uppercase font-mono">
-                  Patient SMS & Portal Preview:
-                </span>
-                <p className="text-[11px] text-rose-900 leading-relaxed">
-                  "Dear {rejectingApt.patientName}, your appointment for {rejectingApt.timeSlot} with {rejectingApt.doctorName} has been cancelled. <strong>Reason: {customReasonNote.trim() ? `${selectedPresetReason} — ${customReasonNote.trim()}` : selectedPresetReason}</strong>. Please reschedule another slot."
-                </p>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -282,7 +262,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                   type="submit"
                   className="px-5 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-xl shadow-xs cursor-pointer"
                 >
-                  Confirm Rejection & Notify Patient
+                  Confirm Rejection
                 </button>
               </div>
             </form>
