@@ -2,23 +2,109 @@ import {
   Appointment,
   InpatientAdmitRecord,
   DischargeRecord,
-  DirectorStats
+  DirectorStats,
+  MedicalDomain
 } from '../types';
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v4';
-const STORAGE_KEY_ADMISSIONS = 'medflow_hospital_admissions_v4';
-const STORAGE_KEY_DISCHARGES = 'medflow_hospital_discharges_v4';
+export const MEDICAL_DOMAINS: MedicalDomain[] = [
+  {
+    id: 'cardio',
+    name: 'Cardiology & Heart Health',
+    doctorName: 'Dr. Maya Lin, MD, FACC',
+    qualification: 'Senior Interventional Cardiologist',
+    experienceYears: 16,
+    chamberNumber: 'Chamber 204 (Wing B)',
+    consultationFee: 150,
+    iconName: 'HeartPulse'
+  },
+  {
+    id: 'neuro',
+    name: 'Neurology & Spine Care',
+    doctorName: 'Dr. David Kim, MD, PhD',
+    qualification: 'Clinical Neurophysiologist & Spine Specialist',
+    experienceYears: 14,
+    chamberNumber: 'Chamber 108 (Wing A)',
+    consultationFee: 175,
+    iconName: 'Brain'
+  },
+  {
+    id: 'ortho',
+    name: 'Orthopedics & Joint Replacement',
+    doctorName: 'Dr. Sarah Jenkins, MD, FAAOS',
+    qualification: 'Consultant Orthopedic & Arthroscopy Surgeon',
+    experienceYears: 18,
+    chamberNumber: 'Chamber 302 (Wing C)',
+    consultationFee: 160,
+    iconName: 'Bone'
+  },
+  {
+    id: 'pediatric',
+    name: 'Pediatrics & Neonatal Care',
+    doctorName: 'Dr. Emily Watson, MD, FAAP',
+    qualification: 'Chief Pediatrician & Child Health Specialist',
+    experienceYears: 12,
+    chamberNumber: 'Chamber 104 (Child Wing)',
+    consultationFee: 130,
+    iconName: 'Baby'
+  },
+  {
+    id: 'onco',
+    name: 'Oncology & Cancer Care',
+    doctorName: 'Dr. Rajesh Patel, MD, FASCO',
+    qualification: 'Senior Medical Oncologist',
+    experienceYears: 20,
+    chamberNumber: 'Chamber 401 (Oncology Center)',
+    consultationFee: 200,
+    iconName: 'Activity'
+  },
+  {
+    id: 'pulmo',
+    name: 'Pulmonology & Respiratory Medicine',
+    doctorName: 'Dr. Marcus Reed, MD, FCCP',
+    qualification: 'Consultant Chest & Pulmonologist',
+    experienceYears: 15,
+    chamberNumber: 'Chamber 210 (Wing B)',
+    consultationFee: 150,
+    iconName: 'Lungs'
+  },
+  {
+    id: 'gastro',
+    name: 'Gastroenterology & Liver Health',
+    doctorName: 'Dr. Anita Desai, MD, FACG',
+    qualification: 'Hepatologist & Endoscopist',
+    experienceYears: 13,
+    chamberNumber: 'Chamber 305 (Wing C)',
+    consultationFee: 160,
+    iconName: 'Stethoscope'
+  },
+  {
+    id: 'derma',
+    name: 'Dermatology & Skin Care',
+    doctorName: 'Dr. Laura Zhang, MD, FAAD',
+    qualification: 'Consultant Dermatologist & Cosmetologist',
+    experienceYears: 11,
+    chamberNumber: 'Chamber 115 (Wing A)',
+    consultationFee: 140,
+    iconName: 'Sparkles'
+  }
+];
+
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v5';
+const STORAGE_KEY_ADMISSIONS = 'medflow_hospital_admissions_v5';
+const STORAGE_KEY_DISCHARGES = 'medflow_hospital_discharges_v5';
 
 const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-101',
     tokenNumber: 'TK-101',
+    appointmentType: 'SPECIALIST_CONSULTATION',
     patientName: 'Robert Chen',
     patientPhone: '+1 (555) 234-8901',
     patientAge: 52,
     patientGender: 'Male',
-    doctorName: 'Dr. Maya Lin, MD',
-    department: 'Cardiology',
+    doctorName: 'Dr. Maya Lin, MD, FACC',
+    department: 'Cardiology & Heart Health',
+    qualification: 'Senior Interventional Cardiologist',
     date: 'Today',
     timeSlot: '10:00 AM',
     symptoms: 'Exertional chest tightness and shortness of breath',
@@ -31,29 +117,32 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-102',
     tokenNumber: 'TK-102',
+    appointmentType: 'GENERAL_OPD',
     patientName: 'Eleanor Vance',
     patientPhone: '+1 (555) 489-1120',
     patientAge: 64,
     patientGender: 'Female',
-    doctorName: 'Dr. Maya Lin, MD',
-    department: 'Cardiology',
+    doctorName: 'Hospital General OPD Physician',
+    department: 'General Outpatient OPD',
     date: 'Today',
     timeSlot: '11:15 AM',
-    symptoms: 'Post-angioplasty 6-month routine evaluation and lipid test',
+    symptoms: 'Routine blood pressure review & seasonal throat allergy',
     status: 'Waiting',
-    fee: 150,
+    fee: 75,
     isPaid: true,
     createdAt: '40 mins ago'
   },
   {
     id: 'apt-103',
     tokenNumber: 'TK-103',
+    appointmentType: 'SPECIALIST_CONSULTATION',
     patientName: 'David Miller',
     patientPhone: '+1 (555) 890-3341',
     patientAge: 38,
     patientGender: 'Male',
-    doctorName: 'Dr. David Kim, MD',
-    department: 'Neurology',
+    doctorName: 'Dr. David Kim, MD, PhD',
+    department: 'Neurology & Spine Care',
+    qualification: 'Clinical Neurophysiologist',
     date: 'Today',
     timeSlot: '02:00 PM',
     symptoms: 'Severe unilateral cluster migraines with visual aura',
@@ -61,23 +150,6 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
     fee: 175,
     isPaid: true,
     createdAt: '25 mins ago'
-  },
-  {
-    id: 'apt-104',
-    tokenNumber: 'TK-104',
-    patientName: 'Samuel Jackson',
-    patientPhone: '+1 (555) 341-9988',
-    patientAge: 45,
-    patientGender: 'Male',
-    doctorName: 'Dr. Maya Lin, MD',
-    department: 'Cardiology',
-    date: 'Today',
-    timeSlot: '03:30 PM',
-    symptoms: 'Mild palpitation during gym workout',
-    status: 'Waiting',
-    fee: 150,
-    isPaid: true,
-    createdAt: '10 mins ago'
   }
 ];
 
@@ -113,23 +185,72 @@ export const api = {
     return getApts();
   },
 
-  bookAppointment: async (data: Partial<Appointment>): Promise<Appointment> => {
+  getSpecialistDomains: (): MedicalDomain[] => {
+    return MEDICAL_DOMAINS;
+  },
+
+  bookGeneralAppointment: async (data: {
+    patientName: string;
+    patientAge: number;
+    patientGender: 'Male' | 'Female' | 'Other';
+    patientPhone: string;
+    symptoms: string;
+    timeSlot: string;
+    date?: string;
+  }): Promise<Appointment> => {
     const list = getApts();
     const token = `TK-${100 + list.length + 1}`;
     const newApt: Appointment = {
       id: `apt-${Date.now()}`,
       tokenNumber: token,
-      patientName: data.patientName || 'New Patient',
-      patientPhone: data.patientPhone || '+1 (555) 000-0000',
-      patientAge: data.patientAge || 35,
-      patientGender: data.patientGender || 'Male',
-      doctorName: data.doctorName || 'Dr. Maya Lin, MD',
-      department: data.department || 'Cardiology',
+      appointmentType: 'GENERAL_OPD',
+      patientName: data.patientName,
+      patientPhone: data.patientPhone,
+      patientAge: data.patientAge,
+      patientGender: data.patientGender,
+      doctorName: 'Hospital General OPD Duty Physician',
+      department: 'General Medicine & OPD',
       date: data.date || 'Today',
-      timeSlot: data.timeSlot || '10:00 AM',
-      symptoms: data.symptoms || 'General Medical Consultation',
+      timeSlot: data.timeSlot,
+      symptoms: data.symptoms,
       status: 'Waiting',
-      fee: 150,
+      fee: 75,
+      isPaid: true,
+      createdAt: 'Just now'
+    };
+    saveApts([newApt, ...list]);
+    return newApt;
+  },
+
+  bookSpecialistAppointment: async (data: {
+    domainId: string;
+    patientName: string;
+    patientAge: number;
+    patientGender: 'Male' | 'Female' | 'Other';
+    patientPhone: string;
+    symptoms: string;
+    timeSlot: string;
+    date?: string;
+  }): Promise<Appointment> => {
+    const list = getApts();
+    const domain = MEDICAL_DOMAINS.find(d => d.id === data.domainId) || MEDICAL_DOMAINS[0];
+    const token = `TK-${100 + list.length + 1}`;
+    const newApt: Appointment = {
+      id: `apt-${Date.now()}`,
+      tokenNumber: token,
+      appointmentType: 'SPECIALIST_CONSULTATION',
+      patientName: data.patientName,
+      patientPhone: data.patientPhone,
+      patientAge: data.patientAge,
+      patientGender: data.patientGender,
+      doctorName: domain.doctorName,
+      department: domain.name,
+      qualification: domain.qualification,
+      date: data.date || 'Today',
+      timeSlot: data.timeSlot,
+      symptoms: data.symptoms,
+      status: 'Waiting',
+      fee: domain.consultationFee,
       isPaid: true,
       createdAt: 'Just now'
     };
@@ -168,7 +289,7 @@ export const api = {
 
   getDirectorStats: async (): Promise<DirectorStats> => {
     const apts = getApts();
-    const opdRev = apts.filter(a => a.status !== 'Rejected').length * 150;
+    const opdRev = apts.filter(a => a.status !== 'Rejected').reduce((sum, a) => sum + a.fee, 0);
     const ipdRev = 13550;
     const pharmRev = 4200;
     const labRev = 3800;

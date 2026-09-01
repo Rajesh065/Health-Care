@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../services/api';
-import { Appointment } from '../types';
+import { api, MEDICAL_DOMAINS } from '../services/api';
+import { Appointment, AppointmentType } from '../types';
 import {
   Calendar,
   Plus,
@@ -9,12 +9,15 @@ import {
   AlertCircle,
   CheckCircle2,
   MessageSquare,
-  Bell,
-  RefreshCw,
-  PhoneCall
+  Building2,
+  Stethoscope,
+  RefreshCw
 } from 'lucide-react';
 
-export const PatientView: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) => {
+export const PatientView: React.FC<{
+  onBookGeneral: () => void;
+  onBookSpecialist: () => void;
+}> = ({ onBookGeneral, onBookSpecialist }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const load = () => {
@@ -31,8 +34,8 @@ export const PatientView: React.FC<{ onBookClick: () => void }> = ({ onBookClick
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Patient Header */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Patient Header with 2 Distinct Booking Options */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-slate-900">Robert Chen — Patient Health Portal</h2>
@@ -40,16 +43,66 @@ export const PatientView: React.FC<{ onBookClick: () => void }> = ({ onBookClick
               PATIENT ID: PT-90482
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Primary Physician: <strong>Dr. Maya Lin, MD</strong></p>
+          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Choose between General OPD or Specialist Doctor Consultations</p>
         </div>
 
-        <button
-          onClick={onBookClick}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Book Specialist Appointment</span>
-        </button>
+        {/* 2 Distinct Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Button 1: Normal General OPD */}
+          <button
+            onClick={onBookGeneral}
+            className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <Building2 className="w-4 h-4 text-teal-700" />
+            <span>Book General OPD ($75)</span>
+          </button>
+
+          {/* Button 2: Specific Specialist Doctor */}
+          <button
+            onClick={onBookSpecialist}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <Stethoscope className="w-4 h-4 text-emerald-400" />
+            <span>Book Specialist Doctor</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Specialist Domains Quick Carousel / Showcase */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
+        <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+          <div>
+            <h3 className="font-bold text-xs text-slate-900 uppercase tracking-wider font-mono">
+              Hospital Specialist Departments ({MEDICAL_DOMAINS.length} Domains)
+            </h3>
+            <p className="text-[11px] text-slate-500">Book direct consultations with senior chief specialists</p>
+          </div>
+          <button
+            onClick={onBookSpecialist}
+            className="text-xs font-bold text-blue-700 hover:underline cursor-pointer"
+          >
+            View All & Book Specialist →
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          {MEDICAL_DOMAINS.slice(0, 4).map(domain => (
+            <div
+              key={domain.id}
+              onClick={onBookSpecialist}
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-400 cursor-pointer transition-all space-y-1 group"
+            >
+              <span className="font-bold text-slate-900 block group-hover:text-blue-700 transition-all">
+                {domain.name}
+              </span>
+              <p className="text-[11px] text-slate-500">{domain.doctorName}</p>
+              <div className="pt-1 border-t border-slate-200/60 flex justify-between items-center text-[10px] font-mono">
+                <span className="text-slate-400">{domain.experienceYears}y Exp</span>
+                <span className="text-emerald-800 font-bold">${domain.consultationFee} USD</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* REAL-TIME SMS / HOSPITAL NOTIFICATION BANNER WHEN REJECTED */}
@@ -89,14 +142,14 @@ export const PatientView: React.FC<{ onBookClick: () => void }> = ({ onBookClick
                 </div>
                 <div className="flex flex-wrap items-center justify-between text-[11px] pt-1 text-slate-600 gap-2">
                   <span className="text-emerald-800 font-bold">
-                    ✓ Full Refund of $150.00 USD has been automatically processed to your original payment method.
+                    ✓ Full Refund of ${rej.fee}.00 USD has been automatically processed to your original payment method.
                   </span>
                   <button
-                    onClick={onBookClick}
+                    onClick={onBookSpecialist}
                     className="bg-rose-800 hover:bg-rose-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Reschedule Another Slot</span>
+                    <span>Reschedule Specialist Slot</span>
                   </button>
                 </div>
               </div>
@@ -118,11 +171,16 @@ export const PatientView: React.FC<{ onBookClick: () => void }> = ({ onBookClick
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <span className={`font-mono font-bold text-[10px] px-2 py-0.5 rounded ${
-                    a.status === 'Rejected' ? 'bg-rose-100 text-rose-800' : 'bg-purple-100 text-purple-900'
-                  }`}>
-                    TOKEN {a.tokenNumber}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-mono font-bold text-[10px] px-2 py-0.5 rounded ${
+                      a.status === 'Rejected' ? 'bg-rose-100 text-rose-800' : 'bg-purple-100 text-purple-900'
+                    }`}>
+                      TOKEN {a.tokenNumber}
+                    </span>
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 bg-slate-100 text-slate-700 rounded">
+                      {a.appointmentType === 'GENERAL_OPD' ? 'General OPD' : 'Specialist'}
+                    </span>
+                  </div>
                   <h4 className="font-bold text-sm text-slate-900 mt-1.5">{a.doctorName}</h4>
                   <p className="text-[11px] text-slate-500">{a.department} • Slot: <strong>{a.timeSlot}</strong></p>
                 </div>

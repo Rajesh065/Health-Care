@@ -2,6 +2,19 @@ export type UserPersona = 'DIRECTOR' | 'DOCTOR' | 'RECEPTIONIST' | 'PATIENT';
 
 export type AppointmentStatus = 'Waiting' | 'Checked In' | 'Completed' | 'Rejected';
 
+export type AppointmentType = 'GENERAL_OPD' | 'SPECIALIST_CONSULTATION';
+
+export interface MedicalDomain {
+  id: string;
+  name: string;
+  doctorName: string;
+  qualification: string;
+  experienceYears: number;
+  chamberNumber: string;
+  consultationFee: number;
+  iconName: string;
+}
+
 export interface HospitalUser {
   id: string;
   name: string;
@@ -14,12 +27,14 @@ export interface HospitalUser {
 export interface Appointment {
   id: string;
   tokenNumber: string;
+  appointmentType: AppointmentType;
   patientName: string;
   patientPhone: string;
   patientAge: number;
   patientGender: 'Male' | 'Female' | 'Other';
   doctorName: string;
   department: string;
+  qualification?: string;
   date: string;
   timeSlot: string;
   symptoms: string;
