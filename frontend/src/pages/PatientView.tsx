@@ -5,7 +5,6 @@ import {
   Calendar,
   Plus,
   Pill,
-  Receipt,
   AlertCircle,
   CheckCircle2,
   MessageSquare,
@@ -48,16 +47,14 @@ export const PatientView: React.FC<{
 
         {/* 2 Distinct Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Button 1: Normal General OPD */}
           <button
             onClick={onBookGeneral}
             className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
           >
             <Building2 className="w-4 h-4 text-teal-700" />
-            <span>Book General OPD ($75)</span>
+            <span>Book General OPD</span>
           </button>
 
-          {/* Button 2: Specific Specialist Doctor */}
           <button
             onClick={onBookSpecialist}
             className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
@@ -68,7 +65,7 @@ export const PatientView: React.FC<{
         </div>
       </div>
 
-      {/* Specialist Domains Quick Carousel / Showcase */}
+      {/* Specialist Domains Showcase */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
         <div className="flex justify-between items-center border-b border-slate-100 pb-2">
           <div>
@@ -98,7 +95,7 @@ export const PatientView: React.FC<{
               <p className="text-[11px] text-slate-500">{domain.doctorName}</p>
               <div className="pt-1 border-t border-slate-200/60 flex justify-between items-center text-[10px] font-mono">
                 <span className="text-slate-400">{domain.experienceYears}y Exp</span>
-                <span className="text-emerald-800 font-bold">${domain.consultationFee} USD</span>
+                <span className="text-blue-700 font-bold">{domain.chamberNumber}</span>
               </div>
             </div>
           ))}
@@ -137,16 +134,17 @@ export const PatientView: React.FC<{
                 <p className="leading-relaxed">
                   <strong>Dear Robert Chen,</strong> your appointment with <strong>{rej.doctorName}</strong> ({rej.department}) for time slot <strong>{rej.timeSlot}</strong> has been cancelled by the Central Hospital Front Desk.
                 </p>
-                <div className="p-2.5 bg-rose-50 rounded-lg border border-rose-200 text-rose-950">
-                  <strong>Cancellation / Rejection Reason:</strong> {rej.rejectionReason || 'Doctor in Emergency Surgery (Slot Full)'}
+                <div className="p-3 bg-rose-50 rounded-xl border border-rose-200 text-rose-950 space-y-1">
+                  <span className="font-bold block text-rose-900">Why was this appointment rejected?</span>
+                  <p className="text-xs text-rose-800 font-semibold">{rej.rejectionReason || 'Doctor in Emergency Surgery (Slot Full)'}</p>
                 </div>
                 <div className="flex flex-wrap items-center justify-between text-[11px] pt-1 text-slate-600 gap-2">
-                  <span className="text-emerald-800 font-bold">
-                    ✓ Full Refund of ${rej.fee}.00 USD has been automatically processed to your original payment method.
+                  <span className="text-slate-500">
+                    If this is a medical emergency, please visit our 24/7 Casualty & Emergency Wing immediately.
                   </span>
                   <button
                     onClick={onBookSpecialist}
-                    className="bg-rose-800 hover:bg-rose-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
+                    className="bg-rose-800 hover:bg-rose-900 text-white font-bold px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Reschedule Specialist Slot</span>
@@ -206,7 +204,9 @@ export const PatientView: React.FC<{
                     <AlertCircle className="w-3.5 h-3.5 text-rose-700" />
                     <span>Appointment Cancelled by Reception</span>
                   </div>
-                  <p className="text-[11px] text-rose-800">Reason: {a.rejectionReason}</p>
+                  <p className="text-[11px] text-rose-800">
+                    <strong>Reason:</strong> {a.rejectionReason}
+                  </p>
                 </div>
               )}
 
@@ -224,11 +224,9 @@ export const PatientView: React.FC<{
                 </div>
               ) : null}
 
-              <div className="pt-2 border-t border-slate-100 flex justify-between text-[11px] font-mono text-slate-500">
-                <span>Consultation Fee: ${a.fee} USD</span>
-                <span className={a.status === 'Rejected' ? 'text-rose-700 font-bold' : 'text-emerald-700 font-bold'}>
-                  {a.status === 'Rejected' ? 'Refund Processed' : '● Paid'}
-                </span>
+              <div className="pt-2 border-t border-slate-100 flex justify-between text-[11px] font-mono text-slate-400">
+                <span>Date: {a.date} ({a.timeSlot})</span>
+                <span className="text-slate-600 font-semibold">{a.status === 'Completed' ? 'Consultation Completed' : a.status}</span>
               </div>
             </div>
           ))}

@@ -10,14 +10,16 @@ import {
   Clock,
   User,
   Filter,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 
 export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBooking }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'CHECKED_IN' | 'COMPLETED' | 'REJECTED'>('ALL');
   const [rejectingApt, setRejectingApt] = useState<Appointment | null>(null);
-  const [rejectReason, setRejectReason] = useState('Doctor in Emergency Surgery (Slot Full)');
+  const [selectedPresetReason, setSelectedPresetReason] = useState('Doctor in Emergency Surgery (Chamber Suspended)');
+  const [customReasonNote, setCustomReasonNote] = useState('');
 
   const load = () => {
     api.getAppointments().then(setAppointments);
@@ -36,9 +38,15 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
   const handleConfirmReject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rejectingApt) return;
-    await api.updateStatus(rejectingApt.id, 'Rejected', rejectReason);
+
+    const fullReason = customReasonNote.trim()
+      ? `${selectedPresetReason}: ${customReasonNote.trim()}`
+      : selectedPresetReason;
+
+    await api.updateStatus(rejectingApt.id, 'Rejected', fullReason);
     setRejectingApt(null);
-    alert(`Appointment token ${rejectingApt.tokenNumber} rejected. Status updated across Doctor and Patient portals.`);
+    setCustomReasonNote('');
+    alert(`Appointment token ${rejectingApt.tokenNumber} rejected with clear reason. Sent SMS & portal message to patient.`);
   };
 
   const filtered = appointments.filter(a => {
@@ -60,7 +68,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
               PRIYA NAIR (RECEPTION LEAD)
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Manage patient check-ins, chamber dispatch, and reject overbooked/cancelled tokens</p>
+          <p className="text-xs text-slate-500 mt-0.5">Manage patient check-ins, chamber dispatch, and reject overbooked tokens with clear reasons</p>
         </div>
 
         <button
@@ -156,9 +164,10 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                   <strong>Complaint:</strong> {a.symptoms}
                 </p>
                 {a.rejectionReason && (
-                  <p className="text-[11px] text-rose-700 font-bold bg-rose-100/60 px-2 py-0.5 rounded inline-block mt-1 border border-rose-200">
-                    Rejection Reason: {a.rejectionReason}
-                  </p>
+                  <div className="p-2 bg-rose-100/70 rounded-lg border border-rose-200 text-rose-900 mt-1">
+                    <span className="font-bold block text-[11px]">Rejection Reason Sent to Patient:</span>
+                    <p className="text-[11px] text-rose-800 mt-0.5">{a.rejectionReason}</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -192,7 +201,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                     className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <XCircle className="w-3.5 h-3.5" />
-                    <span>Reject</span>
+                    <span>Reject with Reason</span>
                   </button>
                 </div>
               )}
@@ -201,14 +210,14 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
         ))}
       </div>
 
-      {/* Reject Appointment Modal */}
+      {/* Enhanced Reject Appointment Modal with Clear Humanized Reason Input */}
       {rejectingApt && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-xs">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-xs">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 text-rose-700 font-bold text-sm">
                 <AlertTriangle className="w-4 h-4" />
-                <span>Reject / Cancel Patient Token</span>
+                <span>State Reason for Rejecting Patient Appointment</span>
               </div>
               <button onClick={() => setRejectingApt(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
                 <X className="w-4 h-4" />
@@ -218,22 +227,47 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <span className="font-mono font-bold text-[10px] text-slate-500">{rejectingApt.tokenNumber}</span>
               <h4 className="font-bold text-slate-900">{rejectingApt.patientName} ({rejectingApt.timeSlot})</h4>
-              <p className="text-slate-600">Assigned Doctor: {rejectingApt.doctorName}</p>
+              <p className="text-slate-600">Assigned Doctor: {rejectingApt.doctorName} ({rejectingApt.department})</p>
             </div>
 
             <form onSubmit={handleConfirmReject} className="space-y-3">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Select Rejection Reason</label>
+                <label className="font-bold text-slate-800 block mb-1">Primary Reason for Rejection *</label>
                 <select
-                  value={rejectReason}
-                  onChange={e => setRejectReason(e.target.value)}
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-800 font-medium"
+                  value={selectedPresetReason}
+                  onChange={e => setSelectedPresetReason(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium"
                 >
-                  <option value="Doctor in Emergency Surgery (Chamber Closed)">Doctor in Emergency Surgery (Chamber Closed)</option>
-                  <option value="Consultation Slot Fully Booked (Overcapacity)">Consultation Slot Fully Booked (Overcapacity)</option>
-                  <option value="Patient Requested Cancellation / Reschedule">Patient Requested Cancellation / Reschedule</option>
-                  <option value="Patient No-Show for Assigned Slot">Patient No-Show for Assigned Slot</option>
+                  <option value="Doctor Called for Emergency Open-Heart / Brain Surgery">Doctor Called for Emergency Surgery (Chamber Suspended)</option>
+                  <option value="Consultation Slot Fully Booked (Maximum Daily Patient Capacity Reached)">Consultation Slot Fully Booked (Maximum Daily Patient Capacity Reached)</option>
+                  <option value="Specialist Physician on Emergency Medical Leave Today">Specialist Physician on Emergency Medical Leave Today</option>
+                  <option value="Patient Requested Appointment Cancellation / Date Reschedule">Patient Requested Appointment Cancellation / Date Reschedule</option>
+                  <option value="Patient No-Show for Scheduled Consultation Slot">Patient No-Show for Scheduled Consultation Slot</option>
+                  <option value="Other Specific Operational Reason">Other Specific Operational Reason (Enter below)</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-800 block mb-1">
+                  Additional Details / Message for Patient (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={customReasonNote}
+                  onChange={e => setCustomReasonNote(e.target.value)}
+                  placeholder="e.g. Dr. Maya Lin is performing an emergency cardiac bypass until 4 PM. Please choose tomorrow's morning slot or visit ER if critical..."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none text-slate-900"
+                />
+              </div>
+
+              {/* Message Preview */}
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1">
+                <span className="font-bold text-rose-950 block text-[10px] uppercase font-mono">
+                  Patient SMS & Portal Preview:
+                </span>
+                <p className="text-[11px] text-rose-900 leading-relaxed">
+                  "Dear {rejectingApt.patientName}, your appointment for {rejectingApt.timeSlot} with {rejectingApt.doctorName} has been cancelled. <strong>Reason: {customReasonNote.trim() ? `${selectedPresetReason} — ${customReasonNote.trim()}` : selectedPresetReason}</strong>. Please reschedule another slot."
+                </p>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -246,9 +280,9 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-xl shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-xl shadow-xs cursor-pointer"
                 >
-                  Confirm Rejection
+                  Confirm Rejection & Notify Patient
                 </button>
               </div>
             </form>

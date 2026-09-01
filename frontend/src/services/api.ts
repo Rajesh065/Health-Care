@@ -14,7 +14,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Senior Interventional Cardiologist',
     experienceYears: 16,
     chamberNumber: 'Chamber 204 (Wing B)',
-    consultationFee: 150,
     iconName: 'HeartPulse'
   },
   {
@@ -24,7 +23,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Clinical Neurophysiologist & Spine Specialist',
     experienceYears: 14,
     chamberNumber: 'Chamber 108 (Wing A)',
-    consultationFee: 175,
     iconName: 'Brain'
   },
   {
@@ -34,7 +32,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Consultant Orthopedic & Arthroscopy Surgeon',
     experienceYears: 18,
     chamberNumber: 'Chamber 302 (Wing C)',
-    consultationFee: 160,
     iconName: 'Bone'
   },
   {
@@ -44,7 +41,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Chief Pediatrician & Child Health Specialist',
     experienceYears: 12,
     chamberNumber: 'Chamber 104 (Child Wing)',
-    consultationFee: 130,
     iconName: 'Baby'
   },
   {
@@ -54,7 +50,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Senior Medical Oncologist',
     experienceYears: 20,
     chamberNumber: 'Chamber 401 (Oncology Center)',
-    consultationFee: 200,
     iconName: 'Activity'
   },
   {
@@ -64,7 +59,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Consultant Chest & Pulmonologist',
     experienceYears: 15,
     chamberNumber: 'Chamber 210 (Wing B)',
-    consultationFee: 150,
     iconName: 'Lungs'
   },
   {
@@ -74,7 +68,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Hepatologist & Endoscopist',
     experienceYears: 13,
     chamberNumber: 'Chamber 305 (Wing C)',
-    consultationFee: 160,
     iconName: 'Stethoscope'
   },
   {
@@ -84,14 +77,11 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Consultant Dermatologist & Cosmetologist',
     experienceYears: 11,
     chamberNumber: 'Chamber 115 (Wing A)',
-    consultationFee: 140,
     iconName: 'Sparkles'
   }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v5';
-const STORAGE_KEY_ADMISSIONS = 'medflow_hospital_admissions_v5';
-const STORAGE_KEY_DISCHARGES = 'medflow_hospital_discharges_v5';
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v6';
 
 const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
@@ -107,11 +97,9 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
     qualification: 'Senior Interventional Cardiologist',
     date: 'Today',
     timeSlot: '10:00 AM',
-    symptoms: 'Exertional chest tightness and shortness of breath',
+    symptoms: 'Exertional chest tightness and shortness of breath on stairs',
     status: 'Checked In',
     prescription: 'Tab. Atorvastatin 20mg once daily at night. Tab. Metoprolol 25mg in morning. Repeat ECG next week.',
-    fee: 150,
-    isPaid: true,
     createdAt: '1 hour ago'
   },
   {
@@ -128,8 +116,6 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
     timeSlot: '11:15 AM',
     symptoms: 'Routine blood pressure review & seasonal throat allergy',
     status: 'Waiting',
-    fee: 75,
-    isPaid: true,
     createdAt: '40 mins ago'
   },
   {
@@ -147,8 +133,6 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
     timeSlot: '02:00 PM',
     symptoms: 'Severe unilateral cluster migraines with visual aura',
     status: 'Waiting',
-    fee: 175,
-    isPaid: true,
     createdAt: '25 mins ago'
   }
 ];
@@ -161,9 +145,9 @@ const DEFAULT_ADMISSIONS: InpatientAdmitRecord[] = [
 ];
 
 const DEFAULT_DISCHARGES: DischargeRecord[] = [
-  { id: 'DIS-201', patientId: 'PT-44019', patientName: 'Thomas Anderson', age: 59, ward: 'General Ward 2B', dischargeTime: '09:00 AM Today', doctorApproved: 'Dr. Arthur Sterling', totalBillPaidUsd: 2850.00, summary: 'Full recovery from acute gastroenteritis and dehydration. Vitals normalized.' },
-  { id: 'DIS-202', patientId: 'PT-55102', patientName: 'Karen White', age: 42, ward: 'Orthopedic Recovery', dischargeTime: '10:30 AM Today', doctorApproved: 'Dr. Sarah Jenkins', totalBillPaidUsd: 4600.00, summary: 'Post-arthroscopic knee repair recovery successful. Physiotherapy chart issued.' },
-  { id: 'DIS-203', patientId: 'PT-33910', patientName: 'Richard Roe', age: 67, ward: 'Cardiac Step-Down', dischargeTime: '11:45 AM Today', doctorApproved: 'Dr. Maya Lin', totalBillPaidUsd: 6100.00, summary: 'Post-angioplasty 48-hour monitoring cleared. Cardiac rehab schedule provided.' }
+  { id: 'DIS-201', patientId: 'PT-44019', patientName: 'Thomas Anderson', age: 59, ward: 'General Ward 2B', dischargeTime: '09:00 AM Today', doctorApproved: 'Dr. Arthur Sterling', summary: 'Full recovery from acute gastroenteritis and dehydration. Vitals normalized.' },
+  { id: 'DIS-202', patientId: 'PT-55102', patientName: 'Karen White', age: 42, ward: 'Orthopedic Recovery', dischargeTime: '10:30 AM Today', doctorApproved: 'Dr. Sarah Jenkins', summary: 'Post-arthroscopic knee repair recovery successful. Physiotherapy chart issued.' },
+  { id: 'DIS-203', patientId: 'PT-33910', patientName: 'Richard Roe', age: 67, ward: 'Cardiac Step-Down', dischargeTime: '11:45 AM Today', doctorApproved: 'Dr. Maya Lin', summary: 'Post-angioplasty 48-hour monitoring cleared. Cardiac rehab schedule provided.' }
 ];
 
 function getApts(): Appointment[] {
@@ -214,8 +198,6 @@ export const api = {
       timeSlot: data.timeSlot,
       symptoms: data.symptoms,
       status: 'Waiting',
-      fee: 75,
-      isPaid: true,
       createdAt: 'Just now'
     };
     saveApts([newApt, ...list]);
@@ -250,8 +232,6 @@ export const api = {
       timeSlot: data.timeSlot,
       symptoms: data.symptoms,
       status: 'Waiting',
-      fee: domain.consultationFee,
-      isPaid: true,
       createdAt: 'Just now'
     };
     saveApts([newApt, ...list]);
@@ -288,26 +268,12 @@ export const api = {
   },
 
   getDirectorStats: async (): Promise<DirectorStats> => {
-    const apts = getApts();
-    const opdRev = apts.filter(a => a.status !== 'Rejected').reduce((sum, a) => sum + a.fee, 0);
-    const ipdRev = 13550;
-    const pharmRev = 4200;
-    const labRev = 3800;
-    const totalRev = opdRev + ipdRev + pharmRev + labRev;
-
     return {
       admittedTodayCount: DEFAULT_ADMISSIONS.length,
       dischargedTodayCount: DEFAULT_DISCHARGES.length,
       totalBeds: 450,
       occupiedBeds: 394,
       icuOccupancy: 88.5,
-      todayRevenueUsd: totalRev,
-      revenueBreakdown: {
-        opdConsultations: opdRev,
-        inpatientWards: ipdRev,
-        pharmacy: pharmRev,
-        laboratoryDiagnostics: labRev
-      },
       doctorsOnDuty: 18,
       erWaitTimeMinutes: 12
     };
