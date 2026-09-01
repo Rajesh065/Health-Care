@@ -1,78 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
-import { AuthModal } from './components/AuthModal';
 import { BookAppointmentModal } from './components/BookAppointmentModal';
 import { LoginPage } from './pages/LoginPage';
-import { DirectorCommandPage } from './pages/DirectorCommandPage';
-import { DoctorRoundsPage } from './pages/DoctorRoundsPage';
-import { AppointmentDeskPage } from './pages/AppointmentDeskPage';
-import { PatientPortalPage } from './pages/PatientPortalPage';
-import { EhrRecordsPage } from './pages/EhrRecordsPage';
-import { BillingInsurancePage } from './pages/BillingInsurancePage';
-import { AuditSecurityPage } from './pages/AuditSecurityPage';
+import { DirectorView } from './pages/DirectorView';
+import { DoctorView } from './pages/DoctorView';
+import { ReceptionView } from './pages/ReceptionView';
+import { PatientView } from './pages/PatientView';
 
 const MainLayout: React.FC = () => {
-  const { persona, isAuthenticated } = useAuth();
-  const [currentTab, setCurrentTab] = useState<string>(() => {
-    if (persona === 'HOSPITAL_HEAD') return 'director-command';
-    if (persona === 'DOCTOR_PHYSICIAN') return 'doctor-rounds';
-    if (persona === 'APPOINTMENT_DESK') return 'appointment-desk';
-    return 'patient-portal';
-  });
+  const { persona, isLoggedIn } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-
-  useEffect(() => {
-    if (persona === 'HOSPITAL_HEAD') setCurrentTab('director-command');
-    else if (persona === 'DOCTOR_PHYSICIAN') setCurrentTab('doctor-rounds');
-    else if (persona === 'APPOINTMENT_DESK') setCurrentTab('appointment-desk');
-    else if (persona === 'PATIENT_USER') setCurrentTab('patient-portal');
-  }, [persona]);
-
-  if (!isAuthenticated) {
-    return <LoginPage onLoggedIn={() => {}} />;
+  if (!isLoggedIn) {
+    return <LoginPage />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans w-full">
-      <Navbar
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-        onBookAppointment={() => setIsBookingOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
-      />
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      <Navbar onBookClick={() => setModalOpen(true)} />
 
-      <main className="flex-1 w-full px-6 py-4 max-w-7xl mx-auto">
-        {(currentTab === 'director-command' || currentTab === 'doctor-roster') && (
-          <DirectorCommandPage />
-        )}
-        {(currentTab === 'doctor-rounds' || currentTab === 'doctor-consultations' || currentTab === 'prescriptions') && (
-          <DoctorRoundsPage activeSubTab={currentTab} />
-        )}
-        {(currentTab === 'appointment-desk' || currentTab === 'bed-allocation' || currentTab === 'front-desk-billing') && (
-          <AppointmentDeskPage
-            activeSubTab={currentTab}
-            onBookAppointment={() => setIsBookingOpen(true)}
-          />
-        )}
-        {(currentTab === 'patient-portal' || currentTab === 'patient-reports' || currentTab === 'patient-prescriptions' || currentTab === 'patient-bills') && (
-          <PatientPortalPage
-            activeSubTab={currentTab}
-            onBookAppointment={() => setIsBookingOpen(true)}
-          />
-        )}
-        {currentTab === 'ehr-records' && <EhrRecordsPage />}
-        {currentTab === 'billing-insurance' && <BillingInsurancePage />}
-        {currentTab === 'audit-security' && <AuditSecurityPage />}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+        {persona === 'DIRECTOR' && <DirectorView />}
+        {persona === 'DOCTOR' && <DoctorView />}
+        {persona === 'RECEPTIONIST' && <ReceptionView onNewBooking={() => setModalOpen(true)} />}
+        {persona === 'PATIENT' && <PatientView onBookClick={() => setModalOpen(true)} />}
       </main>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <BookAppointmentModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-        onBooked={() => {}}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={() => {}}
       />
     </div>
   );
