@@ -4,35 +4,35 @@ import { HospitalUser, UserPersona } from '../types';
 export const HOSPITAL_USERS: HospitalUser[] = [
   {
     id: 'u-director',
-    name: 'Dr. Arthur Sterling',
+    name: 'Dr. Arthur Sterling, MD',
     email: 'director@stjudemedical.org',
     persona: 'DIRECTOR',
-    role: 'Hospital Director',
-    department: 'Hospital Management'
+    role: 'Hospital Director & Medical Superintendent',
+    department: 'Executive Administration'
   },
   {
     id: 'u-doctor',
-    name: 'Dr. Maya Lin',
+    name: 'Dr. Maya Lin, MD',
     email: 'dr.mayalin@stjudemedical.org',
     persona: 'DOCTOR',
-    role: 'Senior Cardiologist',
-    department: 'Cardiology Department'
+    role: 'Chief Cardiologist',
+    department: 'Department of Cardiology'
   },
   {
     id: 'u-receptionist',
     name: 'Priya Nair',
     email: 'reception@stjudemedical.org',
     persona: 'RECEPTIONIST',
-    role: 'Front Desk Receptionist',
-    department: 'Reception & Appointments'
+    role: 'Lead Patient Coordinator',
+    department: 'Central Registration & Appointments'
   },
   {
     id: 'u-patient',
     name: 'Robert Chen',
     email: 'robert.chen@gmail.com',
     persona: 'PATIENT',
-    role: 'Patient',
-    department: 'Patient Portal'
+    role: 'Patient (ID: PT-90482)',
+    department: 'Patient Self-Service Portal'
   }
 ];
 
@@ -48,18 +48,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<HospitalUser>(HOSPITAL_USERS[0]);
+  const [currentUser, setCurrentUser] = useState<HospitalUser>(() => {
+    const saved = localStorage.getItem('medflow_active_persona');
+    if (saved) {
+      const match = HOSPITAL_USERS.find(u => u.persona === saved);
+      if (match) return match;
+    }
+    return HOSPITAL_USERS[0];
+  });
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
   const switchUser = (p: UserPersona) => {
     const found = HOSPITAL_USERS.find(u => u.persona === p) || HOSPITAL_USERS[0];
     setCurrentUser(found);
     setIsLoggedIn(true);
+    localStorage.setItem('medflow_active_persona', p);
   };
 
   const login = (user: HospitalUser) => {
     setCurrentUser(user);
     setIsLoggedIn(true);
+    localStorage.setItem('medflow_active_persona', user.persona);
   };
 
   const logout = () => {
