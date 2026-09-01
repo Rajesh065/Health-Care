@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  Activity,
   Building2,
   CalendarCheck,
   User,
@@ -15,10 +14,7 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center items-center py-12 px-4 sm:px-8 lg:px-12 font-sans w-full">
       <div className="w-full max-w-5xl space-y-8 text-center">
         <div>
-          <div className="w-12 h-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold mx-auto mb-3 shadow-md">
-            <Activity className="w-6 h-6 text-emerald-300" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">MedFlow Healthcare Portals</h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">MedFlow Healthcare Portals</h1>
           <p className="text-sm text-slate-600 mt-1 max-w-xl mx-auto">
             St. Jude Medical Center • Select your authorized role to access the portal
           </p>

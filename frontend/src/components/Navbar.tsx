@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth, HOSPITAL_USERS } from '../context/AuthContext';
 import {
-  Activity,
   Plus,
   ChevronDown,
   User,
@@ -16,16 +15,11 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs w-full">
-      <div className="w-full px-4 sm:px-8 lg:px-12 py-3 flex items-center justify-between gap-4">
-        {/* Left: Brand Logo & Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center font-bold shadow-xs">
-            <Activity className="w-5 h-5 text-emerald-300" />
-          </div>
-          <div>
-            <span className="font-extrabold text-lg tracking-tight text-slate-900 leading-none block">MedFlow</span>
-            <span className="text-[10px] text-slate-500 font-medium leading-none block mt-0.5">St. Jude Medical Center</span>
-          </div>
+      <div className="w-full px-4 sm:px-8 lg:px-12 py-3.5 flex items-center justify-between gap-4">
+        {/* Left: Brand Name (Clean text, top icon removed as requested) */}
+        <div>
+          <span className="font-black text-xl tracking-tight text-slate-900 leading-none block">MedFlow</span>
+          <span className="text-[10px] text-slate-500 font-medium leading-none block mt-0.5">St. Jude Medical Center</span>
         </div>
 
         {/* Center: Current Authorized Role Badge */}
