@@ -31,7 +31,7 @@ export const EmployeeView: React.FC = () => {
   const [startDate, setStartDate] = useState('Tomorrow');
   const [endDate, setEndDate] = useState('Next 3 Days');
   const [reason, setReason] = useState('');
-  const [substituteCover, setSubstituteCover] = useState('Dr. Kevin O'Connor (On-Call)');
+  const [substituteCover, setSubstituteCover] = useState("Dr. Kevin O'Connor (On-Call)");
   const [isApplying, setIsApplying] = useState(false);
 
   // Prescription Writer State for Assigned Patients
