@@ -45,17 +45,24 @@ const MainLayout: React.FC = () => {
       />
 
       <main className="flex-1 w-full px-6 py-4 max-w-7xl mx-auto">
-        {currentTab === 'director-command' && <DirectorCommandPage />}
-        {currentTab === 'doctor-roster' && <DirectorCommandPage />}
-        {currentTab === 'doctor-rounds' && <DoctorRoundsPage />}
-        {currentTab === 'doctor-consultations' && <DoctorRoundsPage />}
-        {currentTab === 'appointment-desk' && <AppointmentDeskPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'bed-allocation' && <AppointmentDeskPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'front-desk-billing' && <AppointmentDeskPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'patient-portal' && <PatientPortalPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'patient-reports' && <PatientPortalPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'patient-prescriptions' && <PatientPortalPage onBookAppointment={() => setIsBookingOpen(true)} />}
-        {currentTab === 'patient-bills' && <PatientPortalPage onBookAppointment={() => setIsBookingOpen(true)} />}
+        {(currentTab === 'director-command' || currentTab === 'doctor-roster') && (
+          <DirectorCommandPage />
+        )}
+        {(currentTab === 'doctor-rounds' || currentTab === 'doctor-consultations' || currentTab === 'prescriptions') && (
+          <DoctorRoundsPage activeSubTab={currentTab} />
+        )}
+        {(currentTab === 'appointment-desk' || currentTab === 'bed-allocation' || currentTab === 'front-desk-billing') && (
+          <AppointmentDeskPage
+            activeSubTab={currentTab}
+            onBookAppointment={() => setIsBookingOpen(true)}
+          />
+        )}
+        {(currentTab === 'patient-portal' || currentTab === 'patient-reports' || currentTab === 'patient-prescriptions' || currentTab === 'patient-bills') && (
+          <PatientPortalPage
+            activeSubTab={currentTab}
+            onBookAppointment={() => setIsBookingOpen(true)}
+          />
+        )}
         {currentTab === 'ehr-records' && <EhrRecordsPage />}
         {currentTab === 'billing-insurance' && <BillingInsurancePage />}
         {currentTab === 'audit-security' && <AuditSecurityPage />}

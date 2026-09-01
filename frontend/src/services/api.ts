@@ -7,8 +7,10 @@ import {
   HospitalExecutiveMetric
 } from '../types';
 
-const STORAGE_KEY_APPS = 'medflow_hospital_appointments_v2';
-const STORAGE_KEY_INPATIENTS = 'medflow_hospital_inpatients_v2';
+const STORAGE_KEY_APPS = 'medflow_hospital_appointments_v3';
+const STORAGE_KEY_INPATIENTS = 'medflow_hospital_inpatients_v3';
+const STORAGE_KEY_PRESCRIPTIONS = 'medflow_hospital_prescriptions_v3';
+const STORAGE_KEY_INVOICES = 'medflow_hospital_invoices_v3';
 
 const DEFAULT_APPOINTMENTS: PatientAppointment[] = [
   {
@@ -190,7 +192,7 @@ const DEFAULT_LAB_REPORTS: LabDiagnosticReport[] = [
     category: 'Cardiology Telemetry',
     resultSummary: 'Normal Sinus Rhythm at 74 bpm. Mild non-specific T-wave flattening in lead V5-V6.',
     status: 'COMPLETED',
-    testDate: 'Aug 31, 2026 (Yesterday)',
+    testDate: 'Aug 31, 2026',
     downloadUrl: '#'
   },
   {
@@ -251,6 +253,7 @@ function getStoredAppointments(): PatientAppointment[] {
 
 function saveStoredAppointments(apps: PatientAppointment[]) {
   localStorage.setItem(STORAGE_KEY_APPS, JSON.stringify(apps));
+  window.dispatchEvent(new Event('medflow_data_updated'));
 }
 
 function getStoredInpatients(): InpatientRecord[] {
@@ -260,6 +263,20 @@ function getStoredInpatients(): InpatientRecord[] {
   }
   localStorage.setItem(STORAGE_KEY_INPATIENTS, JSON.stringify(DEFAULT_INPATIENTS));
   return DEFAULT_INPATIENTS;
+}
+
+function getStoredPrescriptions(): PrescriptionOrder[] {
+  const saved = localStorage.getItem(STORAGE_KEY_PRESCRIPTIONS);
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) {}
+  }
+  localStorage.setItem(STORAGE_KEY_PRESCRIPTIONS, JSON.stringify(DEFAULT_PRESCRIPTIONS));
+  return DEFAULT_PRESCRIPTIONS;
+}
+
+function saveStoredPrescriptions(rxs: PrescriptionOrder[]) {
+  localStorage.setItem(STORAGE_KEY_PRESCRIPTIONS, JSON.stringify(rxs));
+  window.dispatchEvent(new Event('medflow_data_updated'));
 }
 
 export const api = {
@@ -273,7 +290,7 @@ export const api = {
     const newApp: PatientAppointment = {
       id: `app-${Date.now()}`,
       tokenNumber: `TK-${nextToken}`,
-      patientId: data.patientId || 'PT-90482',
+      patientId: data.patientId || `PT-${Math.floor(10000 + Math.random() * 90000)}`,
       patientName: data.patientName || 'Robert Chen',
       patientEmail: data.patientEmail || 'robert.chen@gmail.com',
       patientPhone: data.patientPhone || '+1 (555) 234-8901',
@@ -283,12 +300,12 @@ export const api = {
       doctorName: data.doctorName || 'Dr. Maya Lin, MD, FACC',
       doctorSpecialty: data.doctorSpecialty || 'Cardiology',
       roomNumber: data.roomNumber || 'Chamber 204',
-      appointmentDate: data.appointmentDate || 'Today',
+      appointmentDate: data.appointmentDate || 'Today (Sept 01, 2026)',
       slotTime: data.slotTime || '10:30 AM',
-      symptoms: data.symptoms || 'General Consultation',
+      symptoms: data.symptoms || 'General Specialist Consultation',
       status: 'CONFIRMED',
-      insuranceProvider: data.insuranceProvider || 'BlueCross BlueShield',
-      policyNumber: data.policyNumber || 'BCBS-9048',
+      insuranceProvider: data.insuranceProvider || 'BlueCross BlueShield Premier',
+      policyNumber: data.policyNumber || 'BCBS-9048-2810',
       feeAmountUsd: 150,
       isPaid: true,
       createdAt: 'Just now'
@@ -310,7 +327,27 @@ export const api = {
   },
 
   getPrescriptions: async (): Promise<PrescriptionOrder[]> => {
-    return DEFAULT_PRESCRIPTIONS;
+    return getStoredPrescriptions();
+  },
+
+  createPrescription: async (data: Partial<PrescriptionOrder>): Promise<PrescriptionOrder> => {
+    const list = getStoredPrescriptions();
+    const newRx: PrescriptionOrder = {
+      id: `rx-${Date.now()}`,
+      patientName: data.patientName || 'Robert Chen',
+      doctorName: data.doctorName || 'Dr. Maya Lin, MD, FACC',
+      medicationName: data.medicationName || 'Medication Order',
+      dosage: data.dosage || '10 mg Daily',
+      frequency: data.frequency || 'Once Daily',
+      durationDays: data.durationDays || 30,
+      timing: data.timing || 'Take with food',
+      instructions: data.instructions || 'Cardioprotective therapy',
+      prescribedDate: 'Today (Just now)',
+      refillsLeft: data.refillsLeft ?? 3
+    };
+    const updated = [newRx, ...list];
+    saveStoredPrescriptions(updated);
+    return newRx;
   },
 
   getLabReports: async (): Promise<LabDiagnosticReport[]> => {
