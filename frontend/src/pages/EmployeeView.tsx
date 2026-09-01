@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import {
   SurgeryRecord,
   AttendanceDayRecord,
@@ -13,10 +14,12 @@ import {
   Clock,
   Send,
   AlertCircle,
-  XCircle
+  XCircle,
+  UserCheck
 } from 'lucide-react';
 
 export const EmployeeView: React.FC = () => {
+  const { currentUser } = useAuth();
   const [surgeries, setSurgeries] = useState<SurgeryRecord[]>([]);
   const [attendanceLogs, setAttendanceLogs] = useState<AttendanceDayRecord[]>([]);
   const [leaveRecords, setLeaveRecords] = useState<EmployeeLeaveRecord[]>([]);
@@ -48,9 +51,9 @@ export const EmployeeView: React.FC = () => {
 
     setIsApplying(true);
     await api.applyLeave({
-      employeeName: 'Dr. Sarah Jenkins, MD',
-      role: 'Consultant Orthopedic Surgeon',
-      department: 'Orthopedics & OT',
+      employeeName: currentUser.name,
+      role: currentUser.role,
+      department: currentUser.department,
       leaveType,
       startDate,
       endDate,
@@ -59,15 +62,24 @@ export const EmployeeView: React.FC = () => {
     });
     setIsApplying(false);
     setReason('');
-    alert('Leave application submitted successfully! Sent to Hospital Manager for Accept/Reject decision.');
+    alert(`Leave application for ${currentUser.name} submitted successfully! Forwarded to Manager for approval.`);
     loadData();
   };
 
-  const myLeaves = leaveRecords.filter(l => l.employeeName.includes('Sarah Jenkins'));
+  // Filter leaves for this employee
+  const myLeaves = leaveRecords.filter(l =>
+    l.employeeName.toLowerCase().includes(currentUser.name.toLowerCase()) ||
+    currentUser.name.toLowerCase().includes(l.employeeName.toLowerCase()) ||
+    l.employeeName.includes('Sarah Jenkins')
+  );
+
   const daysPresent = attendanceLogs.filter(a => a.status === 'Present').length;
   const approvedLeaves = myLeaves.filter(l => l.approvalStatus === 'Approved').length;
   const rejectedLeaves = myLeaves.filter(l => l.approvalStatus === 'Rejected').length;
   const pendingLeaves = myLeaves.filter(l => l.approvalStatus === 'Pending Review').length;
+
+  const empId = currentUser.employeeId || 'EMP-8024';
+  const shiftTime = currentUser.shiftTiming || '08:00 AM - 04:30 PM (OT Suite 1)';
 
   return (
     <div className="space-y-6 font-sans w-full">
@@ -75,20 +87,20 @@ export const EmployeeView: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Dr. Sarah Jenkins, MD — Staff & Surgeon Portal</h1>
+            <h1 className="text-xl font-bold text-slate-900">{currentUser.name} — Staff & Doctor Portal</h1>
             <span className="text-[10px] font-bold bg-purple-50 text-purple-900 border border-purple-200 px-2.5 py-0.5 rounded font-mono">
-              EMPLOYEE ID: EMP-8024
+              EMPLOYEE ID: {empId}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Senior Consultant Orthopedic & Joint Surgeon • Chamber 302 (Wing C) & OT Suite 1
+            {currentUser.role} • {currentUser.department}
           </p>
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">
           <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-right">
             <span className="text-[10px] text-emerald-800 font-semibold block">TODAY'S SHIFT TIME</span>
-            <span className="text-base font-black text-emerald-950">08:00 AM - 04:30 PM (OT Suite 1)</span>
+            <span className="text-base font-black text-emerald-950">{shiftTime}</span>
           </div>
         </div>
       </div>
@@ -104,7 +116,7 @@ export const EmployeeView: React.FC = () => {
             </div>
           </div>
           <div className="text-2xl font-black text-blue-900">{daysPresent} Days Present</div>
-          <p className="text-[11px] text-slate-600 font-medium">Shift: <strong>08:00 AM - 04:30 PM</strong> (Biometric Verified)</p>
+          <p className="text-[11px] text-slate-600 font-medium">Shift: <strong>{shiftTime}</strong></p>
         </div>
 
         {/* 2. Operations / Surgeries Performed (Yenni Operations Chesadu) */}
@@ -178,7 +190,7 @@ export const EmployeeView: React.FC = () => {
               <p className="text-xs text-slate-500">Full record of all surgical procedures, robot-assisted arthroplasties, and patient recovery</p>
             </div>
             <span className="text-xs font-mono font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1 rounded-xl">
-              Lead Surgeon Portfolio
+              {currentUser.name} Portfolio
             </span>
           </div>
 
@@ -262,14 +274,14 @@ export const EmployeeView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: APPLY FOR LEAVE & LEAVE STATUS (ACCEPT / REJECT WITH MANAGER REASON) */}
+      {/* TAB 3: APPLY FOR LEAVE & LEAVE STATUS */}
       {activeTab === 'LEAVE' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
           {/* Left: Apply for Leave Form */}
           <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h3 className="font-bold text-base text-slate-900">Apply for Official Leave</h3>
-              <p className="text-xs text-slate-500">Submit leave request for Manager review & approval</p>
+              <p className="text-xs text-slate-500">Applicant: <strong>{currentUser.name}</strong> ({currentUser.role})</p>
             </div>
 
             <form onSubmit={handleApplyLeave} className="space-y-3.5 text-xs">
@@ -326,7 +338,7 @@ export const EmployeeView: React.FC = () => {
                   rows={3}
                   value={reason}
                   onChange={e => setReason(e.target.value)}
-                  placeholder="Explain reason for leave (e.g. Attending Surgical Workshop, personal medical rest)..."
+                  placeholder="Explain reason for leave..."
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none"
                 />
               </div>
@@ -342,15 +354,15 @@ export const EmployeeView: React.FC = () => {
             </form>
           </div>
 
-          {/* Right: My Leave Applications History with Accept / Reject Badges */}
+          {/* Right: My Leave Applications History */}
           <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3 flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-base text-slate-900">My Leave Applications ({myLeaves.length})</h3>
-                <p className="text-xs text-slate-500">Live decision status from Hospital Manager (Marcus Sterling)</p>
+                <p className="text-xs text-slate-500">Live decision status from Hospital Manager</p>
               </div>
               <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">
-                Synced with Manager
+                Employee: {currentUser.name}
               </span>
             </div>
 
