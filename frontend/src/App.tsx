@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { AuthModal } from './components/AuthModal';
 import { BookAppointmentModal } from './components/BookAppointmentModal';
+import { LoginPage } from './pages/LoginPage';
 import { DirectorCommandPage } from './pages/DirectorCommandPage';
 import { DoctorRoundsPage } from './pages/DoctorRoundsPage';
 import { AppointmentDeskPage } from './pages/AppointmentDeskPage';
@@ -12,7 +13,7 @@ import { BillingInsurancePage } from './pages/BillingInsurancePage';
 import { AuditSecurityPage } from './pages/AuditSecurityPage';
 
 const MainLayout: React.FC = () => {
-  const { persona } = useAuth();
+  const { persona, isAuthenticated } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>(() => {
     if (persona === 'HOSPITAL_HEAD') return 'director-command';
     if (persona === 'DOCTOR_PHYSICIAN') return 'doctor-rounds';
@@ -22,6 +23,17 @@ const MainLayout: React.FC = () => {
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  useEffect(() => {
+    if (persona === 'HOSPITAL_HEAD') setCurrentTab('director-command');
+    else if (persona === 'DOCTOR_PHYSICIAN') setCurrentTab('doctor-rounds');
+    else if (persona === 'APPOINTMENT_DESK') setCurrentTab('appointment-desk');
+    else if (persona === 'PATIENT_USER') setCurrentTab('patient-portal');
+  }, [persona]);
+
+  if (!isAuthenticated) {
+    return <LoginPage onLoggedIn={() => {}} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans w-full">
