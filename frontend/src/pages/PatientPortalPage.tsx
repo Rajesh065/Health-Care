@@ -15,27 +15,37 @@ import {
   HeartPulse
 } from 'lucide-react';
 
-export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({ onBookAppointment }) => {
+export const PatientPortalPage: React.FC<{
+  onBookAppointment: () => void;
+  activeSubTab?: string;
+}> = ({ onBookAppointment, activeSubTab }) => {
   const { currentUser } = useAuth();
   const [appointments, setAppointments] = useState<PatientAppointment[]>([]);
   const [labReports, setLabReports] = useState<LabDiagnosticReport[]>([]);
   const [prescriptions, setPrescriptions] = useState<PrescriptionOrder[]>([]);
   const [invoices, setInvoices] = useState<HospitalBillingInvoice[]>([]);
 
-  useEffect(() => {
+  const loadData = () => {
     api.getAppointments().then(data => {
-      setAppointments(data.filter(a => a.patientName.includes('Robert') || a.patientId === 'PT-90482'));
+      setAppointments(data);
     });
     api.getLabReports().then(setLabReports);
     api.getPrescriptions().then(setPrescriptions);
     api.getInvoices().then(setInvoices);
+  };
+
+  useEffect(() => {
+    loadData();
+    window.addEventListener('medflow_data_updated', loadData);
+    return () => window.removeEventListener('medflow_data_updated', loadData);
   }, []);
 
   return (
-    <div className="space-y-6 py-2 w-full">
+    <div className="space-y-6 py-2 w-full font-sans">
+      {/* Patient Welcome Banner */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-purple-800 text-white flex items-center justify-center font-extrabold text-base shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-purple-700 text-white flex items-center justify-center font-extrabold text-base shadow-xs">
             RC
           </div>
           <div>
@@ -53,7 +63,7 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
 
         <button
           onClick={onBookAppointment}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2"
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Book Specialist Appointment</span>
@@ -61,14 +71,16 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
+        {/* Left Column: Booked Appointments & Prescriptions */}
         <div className="lg:col-span-7 space-y-6">
+          {/* Booked Appointments */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-purple-700" />
                 <h3 className="font-bold text-sm text-slate-900">My Booked Appointments ({appointments.length})</h3>
               </div>
-              <button onClick={onBookAppointment} className="text-xs font-bold text-purple-700 hover:underline">
+              <button onClick={onBookAppointment} className="text-xs font-bold text-purple-700 hover:underline cursor-pointer">
                 + Book New Slot
               </button>
             </div>
@@ -103,10 +115,11 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
             </div>
           </div>
 
+          {/* Active Prescriptions */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <Pill className="w-4 h-4 text-blue-700" />
-              <h3 className="font-bold text-sm text-slate-900">My Active Prescriptions & Dosages</h3>
+              <h3 className="font-bold text-sm text-slate-900">My Active Prescriptions & Dosages ({prescriptions.length})</h3>
             </div>
 
             <div className="space-y-2.5 text-xs">
@@ -132,7 +145,9 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
           </div>
         </div>
 
+        {/* Right Column: Lab Reports & Billing */}
         <div className="lg:col-span-5 space-y-6">
+          {/* Diagnostic Lab Reports */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <FileText className="w-4 h-4 text-emerald-700" />
@@ -146,7 +161,7 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
                     <h4 className="font-bold text-slate-900">{rep.reportName}</h4>
                     <button
                       onClick={() => alert(`Downloading verified lab report: ${rep.reportName}`)}
-                      className="p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-200 rounded"
+                      className="p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-200 rounded cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" />
                     </button>
@@ -161,6 +176,7 @@ export const PatientPortalPage: React.FC<{ onBookAppointment: () => void }> = ({
             </div>
           </div>
 
+          {/* Hospital Invoices & Co-Pay */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <CreditCard className="w-4 h-4 text-amber-700" />
