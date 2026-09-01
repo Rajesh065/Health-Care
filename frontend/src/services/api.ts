@@ -211,6 +211,35 @@ const DEFAULT_EMPLOYEE_LEAVES: EmployeeLeaveRecord[] = [
   { id: 'LV-104', employeeName: 'Robert Langdon', role: 'Biomedical Senior Technician', department: 'Biomedical Engineering', leaveType: 'Emergency', startDate: 'Sep 02, 2026', endDate: 'Sep 05, 2026', reason: 'Urgent family relocation matter', substituteCover: 'Biomed. Nathan Drake', approvalStatus: 'Pending Review', appliedDate: 'Aug 30, 2026' }
 ];
 
+const DEFAULT_EQUIPMENT: HospitalEquipment[] = [
+  { id: 'EQ-01', name: 'Siemens Magnetom 3.0T MRI', model: 'Skyra 3T Multi-Channel', department: 'Radiology & Imaging', location: 'Basement Imaging Wing B', status: 'Operational', lastServiced: 'Aug 14, 2026', nextServiceDue: 'Nov 14, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-02', name: 'GE Revolution 128-Slice CT Scanner', model: 'Revolution CT HD', department: 'Radiology & Trauma', location: 'Ground Floor Emergency Wing', status: 'Operational', lastServiced: 'Jul 28, 2026', nextServiceDue: 'Oct 28, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-03', name: 'Dräger Evita V800 ICU Ventilators (x24)', model: 'Evita Infinity V800', department: 'Critical Care ICU', location: 'ICU North & ICU South (3rd Floor)', status: 'Operational', lastServiced: 'Aug 02, 2026', nextServiceDue: 'Sep 02, 2026', technicianInCharge: 'Biomed. Nathan Drake' },
+  { id: 'EQ-04', name: 'Philips Azurion 7 Biplane Cath Lab', model: 'Azurion 7 C20', department: 'Cardiology OT', location: '2nd Floor OT Complex Suite 3', status: 'Operational', lastServiced: 'Aug 19, 2026', nextServiceDue: 'Nov 19, 2026', technicianInCharge: 'Eng. Ryan Cooper' },
+  { id: 'EQ-05', name: 'Fresenius 5008S Dialysis Units (x12)', model: 'Cordiax 5008S', department: 'Renal Dialysis Center', location: '1st Floor Dialysis Wing', status: 'Maintenance Due', lastServiced: 'Jun 10, 2026', nextServiceDue: 'Aug 25, 2026 (Overdue 7 days)', technicianInCharge: 'Biomed. Nathan Drake' },
+  { id: 'EQ-06', name: 'Stryker Mako Robotic Joint Arm', model: 'Mako Total Knee/Hip 3.2', department: 'Orthopedic Surgery', location: 'OT Suite 1 (Orthopedic)', status: 'Under Calibration', lastServiced: 'Aug 30, 2026', nextServiceDue: 'Sep 05, 2026 (Calibration in Progress)', technicianInCharge: 'Eng. Laura Kraft' }
+];
+
+const DEFAULT_WARD_BEDS: WardBedAllocation[] = [
+  { id: 'WB-01', wardName: 'Intensive Care Unit (ICU North & South)', floor: 'Floor 3 (East Wing)', totalBeds: 30, occupiedBeds: 26, availableBeds: 4, headNurse: 'Sarah Connor, RN', ventilatorCount: 24 },
+  { id: 'WB-02', wardName: 'Cardiac Step-Down & Telemetry', floor: 'Floor 2 (Wing B)', totalBeds: 45, occupiedBeds: 38, availableBeds: 7, headNurse: 'Jessica Alba, RN', ventilatorCount: 6 },
+  { id: 'WB-03', wardName: 'Orthopedic & Post-Surgery Ward', floor: 'Floor 3 (Wing C)', totalBeds: 60, occupiedBeds: 52, availableBeds: 8, headNurse: 'Maria Rodriguez, RN', ventilatorCount: 4 },
+  { id: 'WB-04', wardName: 'General Medical Inpatient Ward', floor: 'Floor 1 (Wings A & B)', totalBeds: 150, occupiedBeds: 134, availableBeds: 16, headNurse: 'David Hernandez, RN', ventilatorCount: 8 },
+  { id: 'WB-05', wardName: 'Pediatrics & Neonatal NICU', floor: 'Floor 1 (Child Wing)', totalBeds: 40, occupiedBeds: 32, availableBeds: 8, headNurse: 'Amanda Clark, RN', ventilatorCount: 10 },
+  { id: 'WB-06', wardName: 'Maternity & Gynecology Recovery', floor: 'Floor 2 (Wing A)', totalBeds: 50, occupiedBeds: 41, availableBeds: 9, headNurse: 'Helen Hayes, RN', ventilatorCount: 2 },
+  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: 'Brian O\'Connor, RN', ventilatorCount: 12 },
+  { id: 'WB-08', wardName: 'Day Care Surgery & Chemotherapy', floor: 'Floor 4 (Center Wing)', totalBeds: 50, occupiedBeds: 43, availableBeds: 7, headNurse: 'Rachel Adams, RN', ventilatorCount: 2 }
+];
+
+const DEFAULT_SUPPLIES: SupplyItem[] = [
+  { id: 'SUP-01', itemName: 'Liquid Medical Oxygen (Cryogenic Tank)', category: 'Gas & Power', currentStock: '96% Tank Capacity (12,000 Liters)', status: 'Optimal', reorderLevel: '40%' },
+  { id: 'SUP-02', itemName: 'Universal Blood Bank Units (O-Negative)', category: 'Blood Bank', currentStock: '28 Units (450ml Bags)', status: 'Adequate', reorderLevel: '10 Units' },
+  { id: 'SUP-03', itemName: 'Sterile Surgical Glove Packs (Size 7.5 & 8.0)', category: 'Surgical & Consumables', currentStock: '1,450 Pairs', status: 'Optimal', reorderLevel: '300 Pairs' },
+  { id: 'SUP-04', itemName: 'IV Normal Saline & Ringer Lactate (500ml)', category: 'Critical Medicine', currentStock: '820 Bottles', status: 'Optimal', reorderLevel: '200 Bottles' },
+  { id: 'SUP-05', itemName: 'Emergency ICU Antibiotics (Meropenem 1g)', category: 'Critical Medicine', currentStock: '95 Vials', status: 'Reorder Soon', reorderLevel: '80 Vials' },
+  { id: 'SUP-06', itemName: 'Dual Diesel Generator Backup Fuel', category: 'Gas & Power', currentStock: '100% Fuel Tank (72 Hours Continuous Backup)', status: 'Optimal', reorderLevel: '50%' }
+];
+
 const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v11';
 const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v2';
 
@@ -381,5 +410,49 @@ export const api = {
     const list = getLeaves();
     const updated = list.map(l => l.id === id ? { ...l, approvalStatus: 'Approved' as const } : l);
     saveLeaves(updated);
+  },
+
+  getEquipmentList: async (): Promise<HospitalEquipment[]> => {
+    return DEFAULT_EQUIPMENT;
+  },
+
+  getWardBeds: async (): Promise<WardBedAllocation[]> => {
+    return DEFAULT_WARD_BEDS;
+  },
+
+  getSupplies: async (): Promise<SupplyItem[]> => {
+    return DEFAULT_SUPPLIES;
+  },
+
+  getManagerStats: async (): Promise<ManagerStats> => {
+    const leaves = getLeaves();
+    const activeLeavesCount = leaves.filter(l => l.approvalStatus === 'Approved').length;
+
+    let totalBeds = 0;
+    let occupiedBeds = 0;
+    DEFAULT_WARD_BEDS.forEach(w => {
+      totalBeds += w.totalBeds;
+      occupiedBeds += w.occupiedBeds;
+    });
+    const availableBeds = totalBeds - occupiedBeds;
+
+    const opCount = DEFAULT_EQUIPMENT.filter(e => e.status === 'Operational').length;
+    const serviceCount = DEFAULT_EQUIPMENT.filter(e => e.status !== 'Operational').length;
+
+    return {
+      totalBeds,
+      occupiedBeds,
+      availableBeds,
+      bedOccupancyPercent: Math.round((occupiedBeds / totalBeds) * 1000) / 10,
+      totalEquipmentCount: DEFAULT_EQUIPMENT.length,
+      operationalEquipmentCount: opCount,
+      equipmentNeedsServiceCount: serviceCount,
+      totalEmployeesCount: 142,
+      employeesOnDutyCount: 142 - activeLeavesCount,
+      employeesOnLeaveCount: activeLeavesCount,
+      activeAmbulancesReady: 4,
+      oxygenLevelPercent: 96,
+      powerBackupStatus: '100% (Dual Diesel Gensets Standby)'
+    };
   }
 };
