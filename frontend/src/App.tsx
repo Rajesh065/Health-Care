@@ -36,7 +36,7 @@ const MainLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans w-full">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans w-full">
       <Navbar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -44,7 +44,7 @@ const MainLayout: React.FC = () => {
         onOpenAuth={() => setIsAuthOpen(true)}
       />
 
-      <main className="flex-1 w-full px-6 py-4">
+      <main className="flex-1 w-full px-6 py-4 max-w-7xl mx-auto">
         {currentTab === 'director-command' && <DirectorCommandPage />}
         {currentTab === 'doctor-roster' && <DirectorCommandPage />}
         {currentTab === 'doctor-rounds' && <DoctorRoundsPage />}
