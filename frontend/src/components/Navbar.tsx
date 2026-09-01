@@ -6,7 +6,8 @@ import {
   User,
   LogOut,
   Building2,
-  CalendarCheck
+  CalendarCheck,
+  Stethoscope
 } from 'lucide-react';
 
 export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) => {
@@ -16,7 +17,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs w-full">
       <div className="w-full px-4 sm:px-8 lg:px-12 py-3.5 flex items-center justify-between gap-4">
-        {/* Left: Brand Name (Clean text, top icon removed as requested) */}
+        {/* Left: Brand Name (Clean text) */}
         <div>
           <span className="font-black text-xl tracking-tight text-slate-900 leading-none block">MedFlow</span>
           <span className="text-[10px] text-slate-500 font-medium leading-none block mt-0.5">St. Jude Medical Center</span>
@@ -30,6 +31,12 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
               <span>Manager (Hospital Operations & Facility Control)</span>
             </>
           )}
+          {persona === 'EMPLOYEE' && (
+            <>
+              <Stethoscope className="w-4 h-4 text-purple-700" />
+              <span>Doctor / Staff (Surgeon & Clinical Portal)</span>
+            </>
+          )}
           {persona === 'RECEPTIONIST' && (
             <>
               <CalendarCheck className="w-4 h-4 text-teal-700" />
@@ -38,7 +45,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
           )}
           {persona === 'PATIENT' && (
             <>
-              <User className="w-4 h-4 text-purple-700" />
+              <User className="w-4 h-4 text-emerald-700" />
               <span>Patient (Online Booking & Health Portal)</span>
             </>
           )}
@@ -58,7 +65,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
 
           {persona === 'PATIENT' && <div className="h-5 w-px bg-slate-200"></div>}
 
-          {/* Profile & 3-Role Switcher */}
+          {/* Profile & 4-Role Switcher */}
           <div className="relative">
             <div
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -66,14 +73,21 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
             >
               <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs shadow-xs ${
                 persona === 'MANAGER' ? 'bg-blue-700' :
-                persona === 'RECEPTIONIST' ? 'bg-teal-700' : 'bg-purple-700'
+                persona === 'EMPLOYEE' ? 'bg-purple-700' :
+                persona === 'RECEPTIONIST' ? 'bg-teal-700' : 'bg-emerald-700'
               }`}>
                 {currentUser.name.charAt(0)}
               </div>
               <div className="hidden md:block text-left text-xs">
                 <span className="font-bold text-slate-900 block leading-tight">{currentUser.name}</span>
                 <span className="text-[10px] text-slate-500 font-medium block leading-tight">
-                  {persona === 'MANAGER' ? 'Hospital Manager' : persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}
+                  {persona === 'MANAGER'
+                    ? 'Hospital Manager'
+                    : persona === 'EMPLOYEE'
+                    ? 'Doctor (Surgeon)'
+                    : persona === 'RECEPTIONIST'
+                    ? 'Receptionist'
+                    : 'Patient'}
                 </span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
@@ -84,7 +98,12 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                 <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="font-bold text-slate-900 block">{currentUser.name}</span>
                   <span className="text-[10px] text-slate-400 font-mono block">{currentUser.email}</span>
-                  <span className="text-[10px] text-blue-900 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-bold inline-block mt-1">
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold inline-block mt-1 ${
+                    persona === 'MANAGER' ? 'bg-blue-50 text-blue-900 border border-blue-200' :
+                    persona === 'EMPLOYEE' ? 'bg-purple-50 text-purple-900 border border-purple-200' :
+                    persona === 'RECEPTIONIST' ? 'bg-teal-50 text-teal-900 border border-teal-200' :
+                    'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                  }`}>
                     {currentUser.role}
                   </span>
                 </div>
@@ -104,9 +123,14 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                       >
                         <div className="flex items-center gap-2">
                           {u.persona === 'MANAGER' && <Building2 className="w-3.5 h-3.5 text-blue-400" />}
+                          {u.persona === 'EMPLOYEE' && <Stethoscope className="w-3.5 h-3.5 text-purple-400" />}
                           {u.persona === 'RECEPTIONIST' && <CalendarCheck className="w-3.5 h-3.5 text-teal-400" />}
-                          {u.persona === 'PATIENT' && <User className="w-3.5 h-3.5 text-purple-400" />}
-                          <span>{u.persona === 'MANAGER' ? 'Manager (Hospital Operations)' : u.persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}</span>
+                          {u.persona === 'PATIENT' && <User className="w-3.5 h-3.5 text-emerald-400" />}
+                          <span>
+                            {u.persona === 'MANAGER' ? 'Manager (Hospital Operations)' :
+                             u.persona === 'EMPLOYEE' ? 'Doctor / Staff (Dr. Sarah Jenkins)' :
+                             u.persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}
+                          </span>
                         </div>
                       </button>
                     ))}
