@@ -1,4 +1,4 @@
-export type UserPersona = 'MANAGER' | 'RECEPTIONIST' | 'PATIENT';
+export type UserPersona = 'MANAGER' | 'EMPLOYEE' | 'RECEPTIONIST' | 'PATIENT';
 
 export type AppointmentStatus = 'Waiting' | 'Accepted' | 'Completed' | 'Rejected';
 
@@ -77,6 +77,32 @@ export interface EmployeeLeaveRecord {
   reason: string;
   substituteCover: string;
   approvalStatus: 'Approved' | 'Pending Review';
+  appliedDate: string;
+}
+
+export interface SurgeryRecord {
+  id: string;
+  patientName: string;
+  patientAge: number;
+  procedureName: string;
+  otSuite: string;
+  surgeryDate: string;
+  durationMinutes: number;
+  outcome: 'Successful Recovery' | 'Under Observation in Post-Op' | 'Stable';
+  primarySurgeon: string;
+  assistingTeam: string;
+  notes: string;
+}
+
+export interface AttendanceDayRecord {
+  date: string;
+  day: string;
+  shift: string;
+  punchInTime: string;
+  punchOutTime: string;
+  status: 'Present' | 'On Leave' | 'Off-Duty Rest';
+  hoursWorked: number;
+  departmentFloor: string;
 }
 
 export interface SupplyItem {
