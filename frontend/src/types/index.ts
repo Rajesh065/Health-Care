@@ -1,6 +1,6 @@
 export type UserPersona = 'MD' | 'RECEPTIONIST' | 'PATIENT';
 
-export type AppointmentStatus = 'Waiting' | 'Checked In' | 'Completed' | 'Rejected';
+export type AppointmentStatus = 'Waiting' | 'Accepted' | 'Completed' | 'Rejected';
 
 export type AppointmentType = 'GENERAL_OPD' | 'SPECIALIST_CONSULTATION';
 

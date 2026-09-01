@@ -81,7 +81,7 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
   }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v7';
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v8';
 
 const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
@@ -98,7 +98,7 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
     date: 'Today',
     timeSlot: '10:00 AM',
     symptoms: 'Exertional chest tightness and shortness of breath on stairs',
-    status: 'Checked In',
+    status: 'Accepted',
     prescription: 'Tab. Atorvastatin 20mg once daily at night. Tab. Metoprolol 25mg in morning. Repeat ECG next week.',
     createdAt: '1 hour ago'
   },
