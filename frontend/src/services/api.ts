@@ -85,7 +85,7 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
     qualification: 'Consultant Dermatologist & Cosmetologist',
     experienceYears: 11,
     chamberNumber: 'Chamber 115 (Wing A)',
-    iconName: 'Sparkles'
+    iconName: 'Droplet'
   }
 ];
 

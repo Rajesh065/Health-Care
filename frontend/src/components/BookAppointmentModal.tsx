@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api, MEDICAL_DOMAINS } from '../services/api';
-import { AppointmentType } from '../types';
+import { AppointmentType, MedicalDomain } from '../types';
 import {
   X,
   Calendar,
@@ -11,8 +11,28 @@ import {
   Activity,
   CheckCircle2,
   Phone,
-  Building2
+  Building2,
+  Baby,
+  Bone,
+  Brain,
+  Wind,
+  Droplet
 } from 'lucide-react';
+
+const renderDomainIcon = (iconName: string, isSelected: boolean) => {
+  const className = `w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-700'}`;
+  switch (iconName) {
+    case 'HeartPulse': return <HeartPulse className={className} />;
+    case 'Brain': return <Brain className={className} />;
+    case 'Bone': return <Bone className={className} />;
+    case 'Baby': return <Baby className={className} />;
+    case 'Activity': return <Activity className={className} />;
+    case 'Lungs':
+    case 'Wind': return <Wind className={className} />;
+    case 'Droplet': return <Droplet className={className} />;
+    default: return <Stethoscope className={className} />;
+  }
+};
 
 export const BookAppointmentModal: React.FC<{
   isOpen: boolean;
@@ -89,8 +109,8 @@ export const BookAppointmentModal: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl border border-slate-200 text-xs font-sans max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl border border-slate-200 text-xs max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-3">
           <div>
@@ -98,97 +118,73 @@ export const BookAppointmentModal: React.FC<{
             <p className="text-[11px] text-slate-500">St. Jude Medical Center • Select booking category below</p>
           </div>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer">
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* 2 Distinct Mode Selectors */}
-        <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-100 rounded-xl">
+        {/* 2 Distinct Mode Switcher Buttons */}
+        <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setBookingMode('GENERAL_OPD')}
-            className={`p-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
               bookingMode === 'GENERAL_OPD'
-                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-teal-50/80 border-teal-600 shadow-xs'
+                : 'bg-slate-50 border-slate-200 hover:bg-slate-100 opacity-70'
             }`}
           >
-            <Building2 className="w-4 h-4 text-teal-700" />
-            <div className="text-left">
-              <span className="block font-bold">1. Normal General OPD</span>
-              <span className="text-[10px] text-slate-500 font-normal">Checkup, Fever, Routine visit</span>
+            <div className="flex items-center gap-2">
+              <div className={`p-1.5 rounded-lg ${bookingMode === 'GENERAL_OPD' ? 'bg-teal-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                <Building2 className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-bold text-slate-900 block text-xs">1. General OPD</span>
+                <span className="text-[10px] text-slate-500 block">General Duty Doctor • Fever, Cold, Checkups</span>
+              </div>
             </div>
           </button>
 
           <button
             type="button"
             onClick={() => setBookingMode('SPECIALIST_CONSULTATION')}
-            className={`p-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
               bookingMode === 'SPECIALIST_CONSULTATION'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-blue-50/80 border-blue-600 shadow-xs'
+                : 'bg-slate-50 border-slate-200 hover:bg-slate-100 opacity-70'
             }`}
           >
-            <Stethoscope className="w-4 h-4 text-emerald-400" />
-            <div className="text-left">
-              <span className="block font-bold">2. Specific Specialist Doctor</span>
-              <span className={`text-[10px] font-normal ${bookingMode === 'SPECIALIST_CONSULTATION' ? 'text-slate-300' : 'text-slate-500'}`}>
-                Cardiology, Neurology, Ortho, etc.
-              </span>
+            <div className="flex items-center gap-2">
+              <div className={`p-1.5 rounded-lg ${bookingMode === 'SPECIALIST_CONSULTATION' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                <Stethoscope className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-bold text-slate-900 block text-xs">2. Specialist Doctor</span>
+                <span className="text-[10px] text-slate-500 block">Cardiology, Ortho, Neuro, etc.</span>
+              </div>
             </div>
           </button>
         </div>
 
-        {/* FORMAT 1: NORMAL GENERAL OPD BOOKING */}
+        {/* FORMAT 1: GENERAL OPD BOOKING */}
         {bookingMode === 'GENERAL_OPD' && (
           <form onSubmit={handleGeneralSubmit} className="space-y-4">
-            <div className="p-3 bg-teal-50 border border-teal-200 rounded-xl text-teal-900 space-y-0.5">
-              <span className="font-bold block">Normal General OPD Consultation</span>
-              <p className="text-[11px] text-teal-800">
-                Assigned to On-Duty General Medical Officer for routine health issues, fever, cough, and initial diagnosis.
-              </p>
+            <div className="p-3 bg-teal-50/50 rounded-xl border border-teal-200 flex items-center gap-2 text-teal-950 font-semibold text-[11px]">
+              <Building2 className="w-4 h-4 text-teal-700 shrink-0" />
+              <span>General OPD consultation with On-Duty General Physician at Central Hospital OPD Desk.</span>
             </div>
 
-            {/* Patient Name, Age, Gender */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div className="sm:col-span-6">
-                <label className="font-semibold text-slate-700 block mb-1">Patient Name *</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Patient Full Name *</label>
                 <input
                   required
                   value={patientName}
                   onChange={e => setPatientName(e.target.value)}
-                  placeholder="Full Name"
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800"
+                  placeholder="Enter patient full name"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
                 />
               </div>
 
-              <div className="sm:col-span-3">
-                <label className="font-semibold text-slate-700 block mb-1">Age *</label>
-                <input
-                  required
-                  type="number"
-                  value={patientAge}
-                  onChange={e => setPatientAge(Number(e.target.value))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800"
-                />
-              </div>
-
-              <div className="sm:col-span-3">
-                <label className="font-semibold text-slate-700 block mb-1">Gender *</label>
-                <select
-                  value={patientGender}
-                  onChange={e => setPatientGender(e.target.value as any)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800 font-medium"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Phone Number & Time Slot */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="font-semibold text-slate-700 block mb-1">Phone Number *</label>
                 <input
@@ -199,24 +195,61 @@ export const BookAppointmentModal: React.FC<{
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-mono focus:bg-white focus:border-slate-800"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Patient Age *</label>
+                <input
+                  required
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={patientAge}
+                  onChange={e => setPatientAge(Number(e.target.value))}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                />
+              </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Preferred Time Slot *</label>
+                <label className="font-semibold text-slate-700 block mb-1">Gender *</label>
+                <select
+                  value={patientGender}
+                  onChange={e => setPatientGender(e.target.value as any)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Date *</label>
+                <input
+                  required
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Time Slot *</label>
                 <select
                   value={timeSlot}
                   onChange={e => setTimeSlot(e.target.value)}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-bold text-teal-800 focus:bg-white focus:border-slate-800"
                 >
-                  <option value="09:00 AM">09:00 AM (Morning OPD)</option>
-                  <option value="10:00 AM">10:00 AM (Morning OPD)</option>
-                  <option value="11:30 AM">11:30 AM (Morning OPD)</option>
-                  <option value="02:00 PM">02:00 PM (Afternoon OPD)</option>
-                  <option value="04:00 PM">04:00 PM (Evening OPD)</option>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="04:00 PM">04:00 PM</option>
                 </select>
               </div>
             </div>
 
-            {/* Issue / Symptoms */}
             <div>
               <label className="font-semibold text-slate-700 block mb-1">What is the Issue / Symptoms? *</label>
               <textarea
@@ -248,10 +281,9 @@ export const BookAppointmentModal: React.FC<{
           </form>
         )}
 
-        {/* FORMAT 2: SPECIALIST DOCTOR CONSULTATION BOOKING (SPECIFIC MEDICAL DOMAIN) */}
+        {/* FORMAT 2: SPECIALIST DOCTOR CONSULTATION BOOKING */}
         {bookingMode === 'SPECIALIST_CONSULTATION' && (
           <form onSubmit={handleSpecialistSubmit} className="space-y-4">
-            {/* Step 1: Specific Medical Domain Selector */}
             <div>
               <label className="font-bold text-slate-900 block mb-1.5">
                 Select Medical Domain / Department (Specialist Doctor) *
@@ -269,7 +301,10 @@ export const BookAppointmentModal: React.FC<{
                           : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-800'
                       }`}
                     >
-                      <span className="font-bold block text-xs line-clamp-1">{domain.name.split('&')[0].trim()}</span>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        {renderDomainIcon(domain.iconName, isSelected)}
+                        <span className="font-bold block text-xs line-clamp-1">{domain.name.split('&')[0].trim()}</span>
+                      </div>
                       <span className={`text-[10px] block mt-0.5 font-medium line-clamp-1 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
                         {domain.doctorName.split(',')[0]}
                       </span>
@@ -279,62 +314,35 @@ export const BookAppointmentModal: React.FC<{
               </div>
             </div>
 
-            {/* Selected Specialist Info Box */}
-            <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between text-xs">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4 text-blue-800 shrink-0" />
-                  <h4 className="font-bold text-slate-900">{selectedDomain.doctorName}</h4>
-                  <span className="text-[10px] font-mono bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-bold">
-                    {selectedDomain.experienceYears}y Exp
-                  </span>
+            {/* Selected Specialist Doctor Preview Card */}
+            <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                  {selectedDomain.doctorName.split(' ')[1]?.charAt(0) || 'D'}
                 </div>
-                <p className="text-[11px] text-slate-600 mt-0.5">
-                  {selectedDomain.qualification} • <strong>{selectedDomain.chamberNumber}</strong>
-                </p>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-xs">{selectedDomain.doctorName}</h4>
+                  <p className="text-[11px] text-blue-900 font-medium">{selectedDomain.qualification} • {selectedDomain.experienceYears} Years Exp</p>
+                  <p className="text-[10px] text-slate-500">{selectedDomain.chamberNumber}</p>
+                </div>
               </div>
+              <span className="text-[10px] font-bold bg-blue-100 text-blue-900 px-2 py-1 rounded-lg">
+                Selected
+              </span>
             </div>
 
-            {/* Patient Name, Age, Gender */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div className="sm:col-span-6">
-                <label className="font-semibold text-slate-700 block mb-1">Patient Name *</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Patient Full Name *</label>
                 <input
                   required
                   value={patientName}
                   onChange={e => setPatientName(e.target.value)}
-                  placeholder="Full Name"
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800"
+                  placeholder="Enter patient full name"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
                 />
               </div>
 
-              <div className="sm:col-span-3">
-                <label className="font-semibold text-slate-700 block mb-1">Age *</label>
-                <input
-                  required
-                  type="number"
-                  value={patientAge}
-                  onChange={e => setPatientAge(Number(e.target.value))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800"
-                />
-              </div>
-
-              <div className="sm:col-span-3">
-                <label className="font-semibold text-slate-700 block mb-1">Gender *</label>
-                <select
-                  value={patientGender}
-                  onChange={e => setPatientGender(e.target.value as any)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 focus:bg-white focus:border-slate-800 font-medium"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Phone Number & Specialist Slot */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="font-semibold text-slate-700 block mb-1">Phone Number *</label>
                 <input
@@ -345,34 +353,69 @@ export const BookAppointmentModal: React.FC<{
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-mono focus:bg-white focus:border-slate-800"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Age *</label>
+                <input
+                  required
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={patientAge}
+                  onChange={e => setPatientAge(Number(e.target.value))}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                />
+              </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Specialist Consultation Time Slot *</label>
+                <label className="font-semibold text-slate-700 block mb-1">Gender *</label>
+                <select
+                  value={patientGender}
+                  onChange={e => setPatientGender(e.target.value as any)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Date *</label>
+                <input
+                  required
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-medium focus:bg-white focus:border-slate-800"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-slate-700 block mb-1">Time Slot *</label>
                 <select
                   value={timeSlot}
                   onChange={e => setTimeSlot(e.target.value)}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-900 font-bold text-blue-900 focus:bg-white focus:border-slate-800"
                 >
-                  <option value="10:00 AM">10:00 AM (Specialist Slot)</option>
-                  <option value="11:15 AM">11:15 AM (Specialist Slot)</option>
-                  <option value="02:30 PM">02:30 PM (Specialist Slot)</option>
-                  <option value="03:45 PM">03:45 PM (Specialist Slot)</option>
-                  <option value="05:00 PM">05:00 PM (Specialist Slot)</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="03:30 PM">03:30 PM</option>
+                  <option value="05:00 PM">05:00 PM</option>
                 </select>
               </div>
             </div>
 
-            {/* Specialist Medical Symptoms / Clinical Issue */}
             <div>
-              <label className="font-semibold text-slate-700 block mb-1">
-                Specific Medical Symptoms / Disease History ({selectedDomain.name}) *
-              </label>
+              <label className="font-semibold text-slate-700 block mb-1">Specific Symptoms / Medical Condition *</label>
               <textarea
                 required
                 rows={2}
                 value={symptoms}
                 onChange={e => setSymptoms(e.target.value)}
-                placeholder={`Describe specific symptoms for ${selectedDomain.name} (e.g. Chest pain, palpitations, hypertension history, scan reports)...`}
+                placeholder="Describe specific symptoms (e.g. Sharp chest pain during exertion, post-fracture joint stiffness, neurological tremors)..."
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none text-slate-900 focus:bg-white focus:border-slate-800"
               />
             </div>
@@ -388,10 +431,9 @@ export const BookAppointmentModal: React.FC<{
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer"
               >
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{loading ? 'Confirming...' : `Book ${selectedDomain.doctorName.split(' ')[0]} ${selectedDomain.doctorName.split(' ')[1]}`}</span>
+                {loading ? 'Confirming...' : 'Confirm Specialist Appointment'}
               </button>
             </div>
           </form>
