@@ -76,7 +76,8 @@ export interface EmployeeLeaveRecord {
   endDate: string;
   reason: string;
   substituteCover: string;
-  approvalStatus: 'Approved' | 'Pending Review';
+  approvalStatus: 'Approved' | 'Rejected' | 'Pending Review';
+  managerNote?: string;
   appliedDate: string;
 }
 

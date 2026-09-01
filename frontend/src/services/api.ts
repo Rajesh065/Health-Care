@@ -196,18 +196,18 @@ const DEFAULT_EMPLOYEE_SURGERIES: SurgeryRecord[] = [
 
 const DEFAULT_ATTENDANCE_LOGS: AttendanceDayRecord[] = [
   { date: 'Sep 01, 2026 (Today)', day: 'Monday', shift: 'Morning OT Shift (08:00 AM - 04:30 PM)', punchInTime: '07:52 AM', punchOutTime: 'Active On-Duty', status: 'Present', hoursWorked: 8.5, departmentFloor: 'Floor 3 (OT Complex Suite 1)' },
-  { date: 'Aug 31, 2026', day: 'Sunday', shift: 'On-Call Emergency Trauma Shift', punchInTime: '08:00 AM', punchOutTime: '04:15 PM', status: 'Present', hoursWorked: 8.25, departmentFloor: 'Ground Floor ER & Trauma' },
-  { date: 'Aug 30, 2026', day: 'Saturday', shift: 'Morning Clinical OPD & Ward Rounds', punchInTime: '08:10 AM', punchOutTime: '02:30 PM', status: 'Present', hoursWorked: 6.3, departmentFloor: 'Floor 3 (Wing C Ortho Ward)' },
-  { date: 'Aug 29, 2026', day: 'Friday', shift: 'Major Surgery OT Shift', punchInTime: '07:45 AM', punchOutTime: '05:00 PM', status: 'Present', hoursWorked: 9.25, departmentFloor: 'Floor 3 (OT Suite 2)' },
+  { date: 'Aug 31, 2026', day: 'Sunday', shift: 'On-Call Emergency Trauma Shift (08:00 AM - 04:15 PM)', punchInTime: '08:00 AM', punchOutTime: '04:15 PM', status: 'Present', hoursWorked: 8.25, departmentFloor: 'Ground Floor ER & Trauma' },
+  { date: 'Aug 30, 2026', day: 'Saturday', shift: 'Morning Clinical OPD & Ward Rounds (08:00 AM - 02:30 PM)', punchInTime: '08:10 AM', punchOutTime: '02:30 PM', status: 'Present', hoursWorked: 6.3, departmentFloor: 'Floor 3 (Wing C Ortho Ward)' },
+  { date: 'Aug 29, 2026', day: 'Friday', shift: 'Major Surgery OT Shift (07:45 AM - 05:00 PM)', punchInTime: '07:45 AM', punchOutTime: '05:00 PM', status: 'Present', hoursWorked: 9.25, departmentFloor: 'Floor 3 (OT Suite 2)' },
   { date: 'Aug 28, 2026', day: 'Thursday', shift: 'Weekly Scheduled Off-Duty Rest', punchInTime: '--', punchOutTime: '--', status: 'Off-Duty Rest', hoursWorked: 0, departmentFloor: 'Weekly Rest' },
-  { date: 'Aug 27, 2026', day: 'Wednesday', shift: 'Morning OT & Afternoon OPD', punchInTime: '07:55 AM', punchOutTime: '04:45 PM', status: 'Present', hoursWorked: 8.8, departmentFloor: 'Floor 3 (OT Suite 1)' },
-  { date: 'Aug 26, 2026', day: 'Tuesday', shift: 'Regular Surgery Shift', punchInTime: '08:00 AM', punchOutTime: '04:30 PM', status: 'Present', hoursWorked: 8.5, departmentFloor: 'Floor 3 (Wing C)' }
+  { date: 'Aug 27, 2026', day: 'Wednesday', shift: 'Morning OT & Afternoon OPD (08:00 AM - 04:45 PM)', punchInTime: '07:55 AM', punchOutTime: '04:45 PM', status: 'Present', hoursWorked: 8.8, departmentFloor: 'Floor 3 (OT Suite 1)' },
+  { date: 'Aug 26, 2026', day: 'Tuesday', shift: 'Regular Surgery Shift (08:00 AM - 04:30 PM)', punchInTime: '08:00 AM', punchOutTime: '04:30 PM', status: 'Present', hoursWorked: 8.5, departmentFloor: 'Floor 3 (Wing C)' }
 ];
 
 const DEFAULT_EMPLOYEE_LEAVES: EmployeeLeaveRecord[] = [
-  { id: 'LV-101', employeeName: 'Dr. Sarah Jenkins, MD', role: 'Senior Consultant Orthopedic Surgeon', department: 'Orthopedics', leaveType: 'Conference', startDate: 'Sep 10, 2026', endDate: 'Sep 12, 2026', reason: 'Attending Global Orthopedic Robotics & Joint Replacement Congress in Boston', substituteCover: 'Dr. Kevin O\'Connor (On-Call)', approvalStatus: 'Approved', appliedDate: 'Aug 28, 2026' },
-  { id: 'LV-102', employeeName: 'Dr. Marcus Reed, MD', role: 'Senior Pulmonologist', department: 'Pulmonology', leaveType: 'Conference', startDate: 'Today', endDate: 'Sep 04, 2026', reason: 'Attending International Respiratory & Chest Medicine Symposium in Chicago', substituteCover: 'Dr. Arthur Sterling (On-Call)', approvalStatus: 'Approved', appliedDate: 'Aug 25, 2026' },
-  { id: 'LV-103', employeeName: 'Nurse Jennifer Lopez, BSN', role: 'Senior OT Scrub Nurse', department: 'Operation Theatres', leaveType: 'Casual', startDate: 'Today', endDate: 'Today Evening', reason: 'Family medical emergency', substituteCover: 'Nurse Clara Oswald, RN', approvalStatus: 'Approved', appliedDate: 'Aug 31, 2026' },
+  { id: 'LV-101', employeeName: 'Dr. Sarah Jenkins, MD', role: 'Senior Consultant Orthopedic Surgeon', department: 'Orthopedics', leaveType: 'Conference', startDate: 'Sep 10, 2026', endDate: 'Sep 12, 2026', reason: 'Attending Global Orthopedic Robotics & Joint Replacement Congress in Boston', substituteCover: 'Dr. Kevin O'Connor (On-Call)', approvalStatus: 'Approved', managerNote: 'Approved. Dr. Kevin O'Connor confirmed on-call substitute cover.', appliedDate: 'Aug 28, 2026' },
+  { id: 'LV-102', employeeName: 'Dr. Marcus Reed, MD', role: 'Senior Pulmonologist', department: 'Pulmonology', leaveType: 'Conference', startDate: 'Today', endDate: 'Sep 04, 2026', reason: 'Attending International Respiratory & Chest Medicine Symposium in Chicago', substituteCover: 'Dr. Arthur Sterling (On-Call)', approvalStatus: 'Approved', managerNote: 'Approved. Emergency coverage verified.', appliedDate: 'Aug 25, 2026' },
+  { id: 'LV-103', employeeName: 'Nurse Jennifer Lopez, BSN', role: 'Senior OT Scrub Nurse', department: 'Operation Theatres', leaveType: 'Casual', startDate: 'Today', endDate: 'Today Evening', reason: 'Family medical emergency', substituteCover: 'Nurse Clara Oswald, RN', approvalStatus: 'Approved', managerNote: 'Approved. Nurse Clara Oswald taking scrub lead.', appliedDate: 'Aug 31, 2026' },
   { id: 'LV-104', employeeName: 'Robert Langdon', role: 'Biomedical Senior Technician', department: 'Biomedical Engineering', leaveType: 'Emergency', startDate: 'Sep 02, 2026', endDate: 'Sep 05, 2026', reason: 'Urgent family relocation matter', substituteCover: 'Biomed. Nathan Drake', approvalStatus: 'Pending Review', appliedDate: 'Aug 30, 2026' }
 ];
 
@@ -227,7 +227,7 @@ const DEFAULT_WARD_BEDS: WardBedAllocation[] = [
   { id: 'WB-04', wardName: 'General Medical Inpatient Ward', floor: 'Floor 1 (Wings A & B)', totalBeds: 150, occupiedBeds: 134, availableBeds: 16, headNurse: 'David Hernandez, RN', ventilatorCount: 8 },
   { id: 'WB-05', wardName: 'Pediatrics & Neonatal NICU', floor: 'Floor 1 (Child Wing)', totalBeds: 40, occupiedBeds: 32, availableBeds: 8, headNurse: 'Amanda Clark, RN', ventilatorCount: 10 },
   { id: 'WB-06', wardName: 'Maternity & Gynecology Recovery', floor: 'Floor 2 (Wing A)', totalBeds: 50, occupiedBeds: 41, availableBeds: 9, headNurse: 'Helen Hayes, RN', ventilatorCount: 2 },
-  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: 'Brian O\'Connor, RN', ventilatorCount: 12 },
+  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: 'Brian O'Connor, RN', ventilatorCount: 12 },
   { id: 'WB-08', wardName: 'Day Care Surgery & Chemotherapy', floor: 'Floor 4 (Center Wing)', totalBeds: 50, occupiedBeds: 43, availableBeds: 7, headNurse: 'Rachel Adams, RN', ventilatorCount: 2 }
 ];
 
@@ -240,8 +240,8 @@ const DEFAULT_SUPPLIES: SupplyItem[] = [
   { id: 'SUP-06', itemName: 'Dual Diesel Generator Backup Fuel', category: 'Gas & Power', currentStock: '100% Fuel Tank (72 Hours Continuous Backup)', status: 'Optimal', reorderLevel: '50%' }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v11';
-const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v2';
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v12';
+const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v3';
 
 function getApts(): Appointment[] {
   const saved = localStorage.getItem(STORAGE_KEY_APTS);
@@ -406,9 +406,23 @@ export const api = {
     return getLeaves();
   },
 
-  approveLeave: async (id: string): Promise<void> => {
+  approveLeave: async (id: string, managerNote?: string): Promise<void> => {
     const list = getLeaves();
-    const updated = list.map(l => l.id === id ? { ...l, approvalStatus: 'Approved' as const } : l);
+    const updated = list.map(l => l.id === id ? {
+      ...l,
+      approvalStatus: 'Approved' as const,
+      managerNote: managerNote || 'Approved by Hospital Manager.'
+    } : l);
+    saveLeaves(updated);
+  },
+
+  rejectLeave: async (id: string, managerNote: string): Promise<void> => {
+    const list = getLeaves();
+    const updated = list.map(l => l.id === id ? {
+      ...l,
+      approvalStatus: 'Rejected' as const,
+      managerNote: managerNote || 'Rejected due to critical surgery / on-duty staffing constraints.'
+    } : l);
     saveLeaves(updated);
   },
 
