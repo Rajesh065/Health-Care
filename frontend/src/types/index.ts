@@ -11,7 +11,6 @@ export interface MedicalDomain {
   qualification: string;
   experienceYears: number;
   chamberNumber: string;
-  consultationFee: number;
   iconName: string;
 }
 
@@ -41,8 +40,6 @@ export interface Appointment {
   status: AppointmentStatus;
   rejectionReason?: string;
   prescription?: string;
-  fee: number;
-  isPaid: boolean;
   createdAt: string;
 }
 
@@ -68,7 +65,6 @@ export interface DischargeRecord {
   ward: string;
   dischargeTime: string;
   doctorApproved: string;
-  totalBillPaidUsd: number;
   summary: string;
 }
 
@@ -78,13 +74,6 @@ export interface DirectorStats {
   totalBeds: number;
   occupiedBeds: number;
   icuOccupancy: number;
-  todayRevenueUsd: number;
-  revenueBreakdown: {
-    opdConsultations: number;
-    inpatientWards: number;
-    pharmacy: number;
-    laboratoryDiagnostics: number;
-  };
   doctorsOnDuty: number;
   erWaitTimeMinutes: number;
 }

@@ -11,8 +11,6 @@ import {
   Activity,
   CheckCircle2,
   Phone,
-  ShieldAlert,
-  Sparkles,
   Building2
 } from 'lucide-react';
 
@@ -112,7 +110,7 @@ export const BookAppointmentModal: React.FC<{
             <Building2 className="w-4 h-4 text-teal-700" />
             <div className="text-left">
               <span className="block font-bold">1. Normal General OPD</span>
-              <span className="text-[10px] text-slate-500 font-normal">Checkup, Fever, Routine visit ($75)</span>
+              <span className="text-[10px] text-slate-500 font-normal">Checkup, Fever, Routine visit</span>
             </div>
           </button>
 
@@ -225,24 +223,21 @@ export const BookAppointmentModal: React.FC<{
               />
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-              <span className="font-mono text-slate-500">General OPD Fee: <strong className="text-slate-900 font-bold">$75 USD</strong></span>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer"
-                >
-                  {loading ? 'Booking...' : 'Confirm General Appointment'}
-                </button>
-              </div>
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                {loading ? 'Booking...' : 'Confirm General Appointment'}
+              </button>
             </div>
           </form>
         )}
@@ -272,9 +267,6 @@ export const BookAppointmentModal: React.FC<{
                       <span className={`text-[10px] block mt-0.5 font-medium line-clamp-1 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
                         {domain.doctorName.split(',')[0]}
                       </span>
-                      <span className={`text-[10px] font-mono font-bold block mt-1.5 ${isSelected ? 'text-emerald-300' : 'text-emerald-800'}`}>
-                        ${domain.consultationFee} USD
-                      </span>
                     </div>
                   );
                 })}
@@ -295,8 +287,6 @@ export const BookAppointmentModal: React.FC<{
                   {selectedDomain.qualification} • <strong>{selectedDomain.chamberNumber}</strong>
                 </p>
               </div>
-
-              <span className="font-mono font-black text-sm text-blue-950">${selectedDomain.consultationFee} USD</span>
             </div>
 
             {/* Patient Name, Age, Gender */}
@@ -376,30 +366,27 @@ export const BookAppointmentModal: React.FC<{
                 rows={2}
                 value={symptoms}
                 onChange={e => setSymptoms(e.target.value)}
-                placeholder={`Describe specific symptoms for ${selectedDomain.name} (e.g. Chest pain, palpitations, hypertension history, MRI scan report, previous surgery)...`}
+                placeholder={`Describe specific symptoms for ${selectedDomain.name} (e.g. Chest pain, palpitations, hypertension history, scan reports)...`}
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none resize-none text-slate-900 focus:bg-white focus:border-slate-800"
               />
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-              <span className="font-mono text-slate-500">Specialist Fee: <strong className="text-slate-900 font-bold">${selectedDomain.consultationFee} USD</strong></span>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{loading ? 'Confirming...' : `Book ${selectedDomain.doctorName.split(' ')[0]} ${selectedDomain.doctorName.split(' ')[1]}`}</span>
-                </button>
-              </div>
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{loading ? 'Confirming...' : `Book ${selectedDomain.doctorName.split(' ')[0]} ${selectedDomain.doctorName.split(' ')[1]}`}</span>
+              </button>
             </div>
           </form>
         )}

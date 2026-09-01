@@ -4,7 +4,6 @@ import { DirectorStats, InpatientAdmitRecord, DischargeRecord, Appointment } fro
 import {
   Bed,
   Users,
-  DollarSign,
   Activity,
   UserPlus,
   UserMinus,
@@ -46,13 +45,13 @@ export const DirectorView: React.FC = () => {
               DIRECTOR OVERSIGHT
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Bed Turnover, Patient Inflow/Outflow & Financials</p>
+          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Bed Turnover, Patient Inflow/Outflow & Clinical Operations</p>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 block">TODAY'S HOSPITAL REVENUE</span>
-            <span className="text-base font-black text-emerald-800">${stats.todayRevenueUsd.toLocaleString()} USD</span>
+            <span className="text-[10px] text-slate-400 block">ACTIVE DOCTORS ON DUTY</span>
+            <span className="text-base font-black text-slate-900">{stats.doctorsOnDuty} Specialists</span>
           </div>
         </div>
       </div>
@@ -80,7 +79,7 @@ export const DirectorView: React.FC = () => {
             </div>
           </div>
           <div className="text-2xl font-black text-emerald-900">{stats.dischargedTodayCount} Discharged</div>
-          <p className="text-[11px] text-emerald-700 font-medium">Recovered & Cleared with Bills</p>
+          <p className="text-[11px] text-emerald-700 font-medium">Recovered & Cleared from Wards</p>
         </div>
 
         {/* 3. Bed Capacity */}
@@ -98,52 +97,13 @@ export const DirectorView: React.FC = () => {
         {/* 4. Doctors Shift Coverage */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-1">
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Staff & Doctors on Duty</span>
+            <span className="font-semibold">Consultations Today</span>
             <div className="p-1.5 bg-purple-50 text-purple-700 rounded-lg">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-purple-950">{stats.doctorsOnDuty} Doctors Active</div>
-          <p className="text-[11px] text-slate-500 font-medium">100% Specialist Shift Coverage</p>
-        </div>
-      </div>
-
-      {/* Hospital Revenue Breakdown */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
-          <div>
-            <h3 className="font-bold text-sm text-slate-900">Today's Hospital Financials & Department Revenue</h3>
-            <p className="text-[11px] text-slate-500">Real-time revenue settlement across OPD, Wards, Pharmacy, and Diagnostics</p>
-          </div>
-          <span className="text-xs font-mono font-black text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
-            Total: ${stats.todayRevenueUsd.toLocaleString()} USD
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-            <span className="text-[10px] text-slate-500 block font-sans font-semibold">OPD Consultations</span>
-            <span className="text-base font-black text-slate-900">${stats.revenueBreakdown.opdConsultations.toLocaleString()}</span>
-            <span className="text-[10px] text-slate-400 block font-sans">{appointments.filter(a => a.status !== 'Rejected').length} Consultations</span>
-          </div>
-
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-            <span className="text-[10px] text-slate-500 block font-sans font-semibold">Inpatient Ward Charges</span>
-            <span className="text-base font-black text-slate-900">${stats.revenueBreakdown.inpatientWards.toLocaleString()}</span>
-            <span className="text-[10px] text-slate-400 block font-sans">394 Admitted Beds</span>
-          </div>
-
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-            <span className="text-[10px] text-slate-500 block font-sans font-semibold">Hospital Pharmacy</span>
-            <span className="text-base font-black text-slate-900">${stats.revenueBreakdown.pharmacy.toLocaleString()}</span>
-            <span className="text-[10px] text-slate-400 block font-sans">Prescription Dispensary</span>
-          </div>
-
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-            <span className="text-[10px] text-slate-500 block font-sans font-semibold">Lab & Diagnostics</span>
-            <span className="text-base font-black text-slate-900">${stats.revenueBreakdown.laboratoryDiagnostics.toLocaleString()}</span>
-            <span className="text-[10px] text-slate-400 block font-sans">ECG, CT, Biomarkers</span>
-          </div>
+          <div className="text-2xl font-black text-purple-950">{appointments.length} Patients</div>
+          <p className="text-[11px] text-slate-500 font-medium">OPD & Specialist Queue</p>
         </div>
       </div>
 
@@ -193,7 +153,7 @@ export const DirectorView: React.FC = () => {
               <h3 className="font-bold text-sm text-slate-900">Today's Discharged Patients ({discharges.length})</h3>
             </div>
             <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded">
-              Bed Cleared & Paid
+              Bed Cleared
             </span>
           </div>
 
@@ -207,7 +167,7 @@ export const DirectorView: React.FC = () => {
                     <p className="text-[11px] text-slate-600">{dis.summary}</p>
                   </div>
                   <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                    +${dis.totalBillPaidUsd.toFixed(2)}
+                    Discharged
                   </span>
                 </div>
                 <div className="pt-1 border-t border-slate-200/50 flex justify-between text-[10px] font-mono text-slate-400">
