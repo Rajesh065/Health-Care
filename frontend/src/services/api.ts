@@ -189,7 +189,7 @@ const DEFAULT_OT_OPERATIONS: OTLiveOperation[] = [
     scheduledTime: '10:30 AM (In Progress)',
     durationMinutes: 240,
     elapsedMinutes: 110,
-    assistingTeam: 'Dr. Kevin O'Connor (Perfusionist), Scrub Nurse Jennifer Lopez',
+    assistingTeam: "Dr. Kevin O'Connor (Perfusionist), Scrub Nurse Jennifer Lopez",
     clinicalNotes: 'Triple vessel grafting active under continuous hemodynamic monitoring.'
   },
   {
