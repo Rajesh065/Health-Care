@@ -2,6 +2,10 @@ import {
   Appointment,
   HospitalEquipment,
   WardBedAllocation,
+  RoomBedDetail,
+  OTLiveOperation,
+  AmbulanceVehicle,
+  BloodGroupStock,
   EmployeeLeaveRecord,
   SurgeryRecord,
   AttendanceDayRecord,
@@ -139,6 +143,241 @@ const DEFAULT_APPOINTMENTS: Appointment[] = [
   }
 ];
 
+// 1. Room-Level Bed Layout (Filled vs Kaliga / Available)
+const DEFAULT_ROOM_BEDS: RoomBedDetail[] = [
+  // Ground Floor: ER Casualty & Triage
+  { id: 'BD-G01', floor: 'Ground Floor', wardName: 'Emergency & Trauma Triage', roomNumber: 'ER Bay 01', bedNumber: 'Bed G-01', bedType: 'Emergency Triage Bed', isOccupied: true, patientName: 'Arthur Morgan', patientAge: 45, patientGender: 'Male', admittedDate: 'Today 07:30 AM', attendingDoctor: 'Dr. Marcus Sterling (ER Lead)', diagnosis: 'Acute Polytrauma & Fracture' },
+  { id: 'BD-G02', floor: 'Ground Floor', wardName: 'Emergency & Trauma Triage', roomNumber: 'ER Bay 01', bedNumber: 'Bed G-02', bedType: 'Emergency Triage Bed', isOccupied: false },
+  { id: 'BD-G03', floor: 'Ground Floor', wardName: 'Emergency & Trauma Triage', roomNumber: 'ER Bay 02', bedNumber: 'Bed G-03', bedType: 'Emergency Triage Bed', isOccupied: true, patientName: 'Sita Ramamurthy', patientAge: 62, patientGender: 'Female', admittedDate: 'Today 09:15 AM', attendingDoctor: 'Dr. Maya Lin (Cardiology)', diagnosis: 'Unstable Angina & Chest Pain' },
+  { id: 'BD-G04', floor: 'Ground Floor', wardName: 'Emergency & Trauma Triage', roomNumber: 'ER Bay 02', bedNumber: 'Bed G-04', bedType: 'Emergency Triage Bed', isOccupied: false },
+
+  // Floor 1: General Medical & Pediatrics
+  { id: 'BD-101', floor: 'Floor 1 (Wing A)', wardName: 'General Inpatient Medicine', roomNumber: 'Room 101', bedNumber: 'Bed 101-A', bedType: 'General Ward Bed', isOccupied: true, patientName: 'Michael Chang', patientAge: 51, patientGender: 'Male', admittedDate: 'Aug 29, 2026', attendingDoctor: 'Dr. David Kim', diagnosis: 'Severe Bronchial Infection' },
+  { id: 'BD-102', floor: 'Floor 1 (Wing A)', wardName: 'General Inpatient Medicine', roomNumber: 'Room 101', bedNumber: 'Bed 101-B', bedType: 'General Ward Bed', isOccupied: false },
+  { id: 'BD-103', floor: 'Floor 1 (Wing A)', wardName: 'General Inpatient Medicine', roomNumber: 'Room 102', bedNumber: 'Bed 102-A', bedType: 'Deluxe Private Bed', isOccupied: true, patientName: 'Lakshmi Narayana', patientAge: 70, patientGender: 'Male', admittedDate: 'Aug 30, 2026', attendingDoctor: 'Dr. Anita Desai', diagnosis: 'Hepatic Recovery & Jaundice' },
+  { id: 'BD-104', floor: 'Floor 1 (Child Wing)', wardName: 'Pediatrics NICU/PICU', roomNumber: 'Room 104 (NICU)', bedNumber: 'Bed P-01', bedType: 'ICU Ventilator Bed', isOccupied: true, patientName: 'Baby of Kavya', patientAge: 1, patientGender: 'Female', admittedDate: 'Aug 31, 2026', attendingDoctor: 'Dr. Emily Watson', diagnosis: 'Neonatal Phototherapy' },
+  { id: 'BD-105', floor: 'Floor 1 (Child Wing)', wardName: 'Pediatrics NICU/PICU', roomNumber: 'Room 104 (NICU)', bedNumber: 'Bed P-02', bedType: 'ICU Ventilator Bed', isOccupied: false },
+
+  // Floor 2: Cardiac Telemetry & Maternity
+  { id: 'BD-201', floor: 'Floor 2 (Wing B)', wardName: 'Cardiac Step-Down Telemetry', roomNumber: 'Room 201', bedNumber: 'Bed 201-A', bedType: 'Deluxe Private Bed', isOccupied: true, patientName: 'James Rodriguez', patientAge: 58, patientGender: 'Male', admittedDate: 'Aug 28, 2026', attendingDoctor: 'Dr. Maya Lin', diagnosis: 'Post-Angioplasty Stent Recovery' },
+  { id: 'BD-202', floor: 'Floor 2 (Wing B)', wardName: 'Cardiac Step-Down Telemetry', roomNumber: 'Room 201', bedNumber: 'Bed 201-B', bedType: 'Semi-Private Bed', isOccupied: false },
+  { id: 'BD-203', floor: 'Floor 2 (Wing A)', wardName: 'Maternity Recovery Wing', roomNumber: 'Room 205', bedNumber: 'Bed 205-A', bedType: 'Deluxe Private Bed', isOccupied: true, patientName: 'Deepa Sharma', patientAge: 29, patientGender: 'Female', admittedDate: 'Yesterday 11:00 PM', attendingDoctor: 'Dr. Emily Watson', diagnosis: 'Normal Delivery Post-Natal' },
+  { id: 'BD-204', floor: 'Floor 2 (Wing A)', wardName: 'Maternity Recovery Wing', roomNumber: 'Room 205', bedNumber: 'Bed 205-B', bedType: 'Deluxe Private Bed', isOccupied: false },
+
+  // Floor 3: ICU North/South & Orthopedics
+  { id: 'BD-301', floor: 'Floor 3 (East Wing)', wardName: 'Critical Care ICU Complex', roomNumber: 'ICU Pod 01', bedNumber: 'ICU Bed 01', bedType: 'ICU Ventilator Bed', isOccupied: true, patientName: 'George William', patientAge: 73, patientGender: 'Male', admittedDate: 'Aug 27, 2026', attendingDoctor: 'Dr. Marcus Reed (ICU In-Charge)', diagnosis: 'Severe ARDS & Sepsis Support' },
+  { id: 'BD-302', floor: 'Floor 3 (East Wing)', wardName: 'Critical Care ICU Complex', roomNumber: 'ICU Pod 01', bedNumber: 'ICU Bed 02', bedType: 'ICU Ventilator Bed', isOccupied: false },
+  { id: 'BD-303', floor: 'Floor 3 (Wing C)', wardName: 'Orthopedic Post-Op Ward', roomNumber: 'Room 302', bedNumber: 'Bed 302-A', bedType: 'Semi-Private Bed', isOccupied: true, patientName: 'Thomas Anderson', patientAge: 59, patientGender: 'Male', admittedDate: 'Yesterday 04:00 PM', attendingDoctor: 'Dr. Sarah Jenkins', diagnosis: 'Robotic Knee Replacement Post-Op' },
+  { id: 'BD-304', floor: 'Floor 3 (Wing C)', wardName: 'Orthopedic Post-Op Ward', roomNumber: 'Room 302', bedNumber: 'Bed 302-B', bedType: 'Semi-Private Bed', isOccupied: false },
+
+  // Floor 4: Day Care & Chemotherapy
+  { id: 'BD-401', floor: 'Floor 4 (Center Wing)', wardName: 'Day Care Surgery & Oncology', roomNumber: 'Room 401', bedNumber: 'Chemo Chair 01', bedType: 'General Ward Bed', isOccupied: true, patientName: 'Ananya Roy', patientAge: 48, patientGender: 'Female', admittedDate: 'Today 08:00 AM', attendingDoctor: 'Dr. Rajesh Patel', diagnosis: 'Cycle 4 Infusion Chemotherapy' },
+  { id: 'BD-402', floor: 'Floor 4 (Center Wing)', wardName: 'Day Care Surgery & Oncology', roomNumber: 'Room 401', bedNumber: 'Chemo Chair 02', bedType: 'General Ward Bed', isOccupied: false }
+];
+
+// 2. Live OT Operations (Running Now, Upcoming Today, Completed Today)
+const DEFAULT_OT_OPERATIONS: OTLiveOperation[] = [
+  // Running Now (Live in OT)
+  {
+    id: 'OT-OP-01',
+    procedureName: 'Off-Pump Coronary Artery Bypass Graft (CABG)',
+    patientName: 'Ramesh Sundaram',
+    patientAge: 61,
+    primarySurgeon: 'Dr. Maya Lin, MD (Chief Cardio Surgeon)',
+    otSuite: 'OT Suite 3 (Cardiac Biplane Cath Suite)',
+    status: 'RUNNING',
+    scheduledTime: '10:30 AM (In Progress)',
+    durationMinutes: 240,
+    elapsedMinutes: 110,
+    assistingTeam: 'Dr. Kevin O'Connor (Perfusionist), Scrub Nurse Jennifer Lopez',
+    clinicalNotes: 'Triple vessel grafting active under continuous hemodynamic monitoring.'
+  },
+  {
+    id: 'OT-OP-02',
+    procedureName: 'Robotic Total Knee Arthroplasty (Stryker Mako)',
+    patientName: 'Sunita Reddy',
+    patientAge: 56,
+    primarySurgeon: 'Dr. Sarah Jenkins, MD (Orthopedic Lead)',
+    otSuite: 'OT Suite 1 (Orthopedic Robotics)',
+    status: 'RUNNING',
+    scheduledTime: '11:00 AM (In Progress)',
+    durationMinutes: 120,
+    elapsedMinutes: 50,
+    assistingTeam: 'Anesthesia Team Alpha, Scrub Lead Clara Oswald',
+    clinicalNotes: 'Femoral resection alignment 0.3 deg. Tibial tray positioning in progress.'
+  },
+
+  // Upcoming Today
+  {
+    id: 'OT-OP-03',
+    procedureName: 'Micro-Discectomy & L4-L5 Spinal Decompression',
+    patientName: 'Joseph Martinez',
+    patientAge: 44,
+    primarySurgeon: 'Dr. David Kim, MD, PhD (Neurosurgeon)',
+    otSuite: 'OT Suite 2 (Neuro & Spine)',
+    status: 'UPCOMING',
+    scheduledTime: '02:00 PM Today',
+    durationMinutes: 150,
+    assistingTeam: 'Dr. James Ford (Anesthetist), Nurse Sarah Connor',
+    clinicalNotes: 'Pre-op spinal MRI loaded into navigation console. Patient in pre-anesthesia holding.'
+  },
+  {
+    id: 'OT-OP-04',
+    procedureName: 'Laparoscopic Cholecystectomy (Gallbladder)',
+    patientName: 'Fatima Al-Sayed',
+    patientAge: 39,
+    primarySurgeon: 'Dr. Anita Desai, MD (Surgical Gastro Lead)',
+    otSuite: 'OT Suite 4 (General & Laparoscopy)',
+    status: 'UPCOMING',
+    scheduledTime: '03:45 PM Today',
+    durationMinutes: 75,
+    assistingTeam: 'Dr. Arthur Sterling, Scrub Nurse Rachel Adams',
+    clinicalNotes: 'Elective keyhole surgery for symptomatic gallstones.'
+  },
+
+  // Completed Today
+  {
+    id: 'OT-OP-05',
+    procedureName: 'Arthroscopic ACL Reconstruction & Meniscus Repair',
+    patientName: 'Karen White',
+    patientAge: 42,
+    primarySurgeon: 'Dr. Sarah Jenkins, MD',
+    otSuite: 'OT Suite 1 (Orthopedic Robotics)',
+    status: 'COMPLETED',
+    scheduledTime: '08:30 AM - 10:15 AM',
+    durationMinutes: 105,
+    assistingTeam: 'Anesthesia Team Bravo',
+    clinicalNotes: 'Bio-absorbable screw fixation verified. Shifted safely to Post-Op Recovery Room 302.'
+  },
+  {
+    id: 'OT-OP-06',
+    procedureName: 'Emergency Burr Hole Evacuation (Subdural Hematoma)',
+    patientName: 'Vikramaditya Rao',
+    patientAge: 67,
+    primarySurgeon: 'Dr. David Kim, MD',
+    otSuite: 'OT Suite 2 (Trauma)',
+    status: 'COMPLETED',
+    scheduledTime: '07:00 AM - 08:30 AM',
+    durationMinutes: 90,
+    assistingTeam: 'Trauma ER Team 1',
+    clinicalNotes: 'Intracranial pressure normalized. Extubated and transferred to ICU Pod 01.'
+  }
+];
+
+// 3. Ambulance Fleet & Monthly Cost Breakdown
+const DEFAULT_AMBULANCES: AmbulanceVehicle[] = [
+  {
+    id: 'AMB-01',
+    vehicleNumber: 'AP-09-MED-1001',
+    type: 'Advanced Cardiac ICU Life Support (ACLS)',
+    status: 'Standby',
+    driverName: 'Ramu Naidu (Emergency Certified)',
+    paramedicLead: 'Paramedic Johnathan Vance, EMT-P',
+    currentLocation: 'St. Jude Ground ER Bay 1',
+    monthlyCostUSD: 2450,
+    monthlyCostINR: 202000,
+    fuelExpense: 650,
+    staffSalary: 1400,
+    maintenanceExpense: 400
+  },
+  {
+    id: 'AMB-02',
+    vehicleNumber: 'AP-09-MED-1002',
+    type: 'Advanced Cardiac ICU Life Support (ACLS)',
+    status: 'In Transit (Emergency)',
+    driverName: 'K. Venkatesh',
+    paramedicLead: 'Paramedic Sarah Miller, EMT-P',
+    currentLocation: 'Highway Junction 4 (En-route with STEMI Patient)',
+    monthlyCostUSD: 2550,
+    monthlyCostINR: 210000,
+    fuelExpense: 750,
+    staffSalary: 1400,
+    maintenanceExpense: 400
+  },
+  {
+    id: 'AMB-03',
+    vehicleNumber: 'AP-09-MED-1003',
+    type: 'Basic Life Support (BLS)',
+    status: 'Standby',
+    driverName: 'Mohammad Rafiq',
+    paramedicLead: 'Paramedic Priya Sharma, EMT-B',
+    currentLocation: 'St. Jude Ground ER Bay 2',
+    monthlyCostUSD: 1900,
+    monthlyCostINR: 156000,
+    fuelExpense: 500,
+    staffSalary: 1100,
+    maintenanceExpense: 300
+  },
+  {
+    id: 'AMB-04',
+    vehicleNumber: 'AP-09-MED-1004',
+    type: 'Basic Life Support (BLS)',
+    status: 'Standby',
+    driverName: 'Suresh Kumar',
+    paramedicLead: 'Paramedic David Ross, EMT-B',
+    currentLocation: 'St. Jude Ground ER Bay 3',
+    monthlyCostUSD: 1900,
+    monthlyCostINR: 156000,
+    fuelExpense: 500,
+    staffSalary: 1100,
+    maintenanceExpense: 300
+  },
+  {
+    id: 'AMB-05',
+    vehicleNumber: 'AP-09-MED-1005',
+    type: 'Neonatal Emergency Transport',
+    status: 'Under Maintenance',
+    driverName: 'Shankar Goud',
+    paramedicLead: 'NICU Specialist Nurse Clara',
+    currentLocation: 'Authorized Mercedes-Benz Medical Workshop',
+    monthlyCostUSD: 2700,
+    monthlyCostINR: 221000,
+    fuelExpense: 400,
+    staffSalary: 1300,
+    maintenanceExpense: 1000
+  }
+];
+
+// 4. Blood Bank Matrix: Available Stock vs Depleted vs Urgent Demand
+const DEFAULT_BLOOD_STOCK: BloodGroupStock[] = [
+  { group: 'O+', unitsAvailable: 54, safeReserveTarget: 40, status: 'Optimal', urgentUnitsNeeded: 0 },
+  { group: 'A+', unitsAvailable: 42, safeReserveTarget: 35, status: 'Optimal', urgentUnitsNeeded: 0 },
+  { group: 'B+', unitsAvailable: 36, safeReserveTarget: 30, status: 'Optimal', urgentUnitsNeeded: 0 },
+  { group: 'AB+', unitsAvailable: 18, safeReserveTarget: 15, status: 'Adequate', urgentUnitsNeeded: 0 },
+  {
+    group: 'O-',
+    unitsAvailable: 2,
+    safeReserveTarget: 25,
+    status: 'Critical Shortage',
+    urgentUnitsNeeded: 23,
+    urgentReason: 'URGENT: Universal Donor required for Emergency Room trauma & multi-trauma resuscitation!'
+  },
+  {
+    group: 'B-',
+    unitsAvailable: 1,
+    safeReserveTarget: 15,
+    status: 'Critical Shortage',
+    urgentUnitsNeeded: 14,
+    urgentReason: 'URGENT: Needed for afternoon CABG Cardiac Bypass and Orthopedic Joint Surgeries.'
+  },
+  {
+    group: 'AB-',
+    unitsAvailable: 0,
+    safeReserveTarget: 10,
+    status: 'Depleted / Empty',
+    urgentUnitsNeeded: 10,
+    urgentReason: 'COMPLETELY OUT OF STOCK: Rare group donor camp / Red Cross blood dispatch requested immediately!'
+  },
+  {
+    group: 'A-',
+    unitsAvailable: 3,
+    safeReserveTarget: 15,
+    status: 'Critical Shortage',
+    urgentUnitsNeeded: 12,
+    urgentReason: 'LOW STOCK: 3 units remaining in cold cryogenic storage.'
+  }
+];
+
 const DEFAULT_EMPLOYEE_SURGERIES: SurgeryRecord[] = [
   {
     id: 'SURG-401',
@@ -165,43 +404,13 @@ const DEFAULT_EMPLOYEE_SURGERIES: SurgeryRecord[] = [
     primarySurgeon: 'Dr. Sarah Jenkins, MD',
     assistingTeam: 'Dr. Maya Lin (Cardiac Clearance), Nurse Clara Oswald',
     notes: 'Implant alignment within 0.5 degrees via Stryker Mako robotic arm. Minimum blood loss, shifted to recovery ward.'
-  },
-  {
-    id: 'SURG-403',
-    patientName: 'Samuel Jackson',
-    patientAge: 68,
-    procedureName: 'Bilateral Hip Joint Resurfacing & Decompression',
-    otSuite: 'OT Suite 2 (General Trauma)',
-    surgeryDate: 'Aug 29, 2026',
-    durationMinutes: 160,
-    outcome: 'Successful Recovery',
-    primarySurgeon: 'Dr. Sarah Jenkins, MD',
-    assistingTeam: 'Anesthesia Team Bravo',
-    notes: 'Ceramic on poly bearings seated with press-fit femoral stem. Stable vitals.'
-  },
-  {
-    id: 'SURG-404',
-    patientName: 'Rachel Green',
-    patientAge: 31,
-    procedureName: 'Rotator Cuff Tendon Micro-Repair (Left Shoulder)',
-    otSuite: 'OT Suite 1 (Orthopedic Robotics)',
-    surgeryDate: 'Aug 27, 2026',
-    durationMinutes: 90,
-    outcome: 'Successful Recovery',
-    primarySurgeon: 'Dr. Sarah Jenkins, MD',
-    assistingTeam: 'Nurse Sarah Connor',
-    notes: 'Shoulder subacromial decompression completed. Arm immobilizer applied.'
   }
 ];
 
 const DEFAULT_ATTENDANCE_LOGS: AttendanceDayRecord[] = [
   { date: 'Sep 01, 2026 (Today)', day: 'Monday', shift: 'Morning OT Shift (08:00 AM - 04:30 PM)', punchInTime: '07:52 AM', punchOutTime: 'Active On-Duty', status: 'Present', hoursWorked: 8.5, departmentFloor: 'Floor 3 (OT Complex Suite 1)' },
   { date: 'Aug 31, 2026', day: 'Sunday', shift: 'On-Call Emergency Trauma Shift (08:00 AM - 04:15 PM)', punchInTime: '08:00 AM', punchOutTime: '04:15 PM', status: 'Present', hoursWorked: 8.25, departmentFloor: 'Ground Floor ER & Trauma' },
-  { date: 'Aug 30, 2026', day: 'Saturday', shift: 'Morning Clinical OPD & Ward Rounds (08:00 AM - 02:30 PM)', punchInTime: '08:10 AM', punchOutTime: '02:30 PM', status: 'Present', hoursWorked: 6.3, departmentFloor: 'Floor 3 (Wing C Ortho Ward)' },
-  { date: 'Aug 29, 2026', day: 'Friday', shift: 'Major Surgery OT Shift (07:45 AM - 05:00 PM)', punchInTime: '07:45 AM', punchOutTime: '05:00 PM', status: 'Present', hoursWorked: 9.25, departmentFloor: 'Floor 3 (OT Suite 2)' },
-  { date: 'Aug 28, 2026', day: 'Thursday', shift: 'Weekly Scheduled Off-Duty Rest', punchInTime: '--', punchOutTime: '--', status: 'Off-Duty Rest', hoursWorked: 0, departmentFloor: 'Weekly Rest' },
-  { date: 'Aug 27, 2026', day: 'Wednesday', shift: 'Morning OT & Afternoon OPD (08:00 AM - 04:45 PM)', punchInTime: '07:55 AM', punchOutTime: '04:45 PM', status: 'Present', hoursWorked: 8.8, departmentFloor: 'Floor 3 (OT Suite 1)' },
-  { date: 'Aug 26, 2026', day: 'Tuesday', shift: 'Regular Surgery Shift (08:00 AM - 04:30 PM)', punchInTime: '08:00 AM', punchOutTime: '04:30 PM', status: 'Present', hoursWorked: 8.5, departmentFloor: 'Floor 3 (Wing C)' }
+  { date: 'Aug 30, 2026', day: 'Saturday', shift: 'Morning Clinical OPD & Ward Rounds (08:00 AM - 02:30 PM)', punchInTime: '08:10 AM', punchOutTime: '02:30 PM', status: 'Present', hoursWorked: 6.3, departmentFloor: 'Floor 3 (Wing C Ortho Ward)' }
 ];
 
 const DEFAULT_EMPLOYEE_LEAVES: EmployeeLeaveRecord[] = [
@@ -233,15 +442,13 @@ const DEFAULT_WARD_BEDS: WardBedAllocation[] = [
 
 const DEFAULT_SUPPLIES: SupplyItem[] = [
   { id: 'SUP-01', itemName: 'Liquid Medical Oxygen (Cryogenic Tank)', category: 'Gas & Power', currentStock: '96% Tank Capacity (12,000 Liters)', status: 'Optimal', reorderLevel: '40%' },
-  { id: 'SUP-02', itemName: 'Universal Blood Bank Units (O-Negative)', category: 'Blood Bank', currentStock: '28 Units (450ml Bags)', status: 'Adequate', reorderLevel: '10 Units' },
-  { id: 'SUP-03', itemName: 'Sterile Surgical Glove Packs (Size 7.5 & 8.0)', category: 'Surgical & Consumables', currentStock: '1,450 Pairs', status: 'Optimal', reorderLevel: '300 Pairs' },
-  { id: 'SUP-04', itemName: 'IV Normal Saline & Ringer Lactate (500ml)', category: 'Critical Medicine', currentStock: '820 Bottles', status: 'Optimal', reorderLevel: '200 Bottles' },
-  { id: 'SUP-05', itemName: 'Emergency ICU Antibiotics (Meropenem 1g)', category: 'Critical Medicine', currentStock: '95 Vials', status: 'Reorder Soon', reorderLevel: '80 Vials' },
-  { id: 'SUP-06', itemName: 'Dual Diesel Generator Backup Fuel', category: 'Gas & Power', currentStock: '100% Fuel Tank (72 Hours Continuous Backup)', status: 'Optimal', reorderLevel: '50%' }
+  { id: 'SUP-02', itemName: 'Sterile Surgical Glove Packs (Size 7.5 & 8.0)', category: 'Surgical & Consumables', currentStock: '1,450 Pairs', status: 'Optimal', reorderLevel: '300 Pairs' },
+  { id: 'SUP-03', itemName: 'IV Normal Saline & Ringer Lactate (500ml)', category: 'Critical Medicine', currentStock: '820 Bottles', status: 'Optimal', reorderLevel: '200 Bottles' },
+  { id: 'SUP-04', itemName: 'Emergency ICU Antibiotics (Meropenem 1g)', category: 'Critical Medicine', currentStock: '95 Vials', status: 'Reorder Soon', reorderLevel: '80 Vials' }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v12';
-const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v3';
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v14';
+const STORAGE_KEY_LEAVES = 'medflow_hospital_leaves_v4';
 
 function getApts(): Appointment[] {
   const saved = localStorage.getItem(STORAGE_KEY_APTS);
@@ -434,6 +641,22 @@ export const api = {
     return DEFAULT_WARD_BEDS;
   },
 
+  getRoomBeds: async (): Promise<RoomBedDetail[]> => {
+    return DEFAULT_ROOM_BEDS;
+  },
+
+  getOTOperations: async (): Promise<OTLiveOperation[]> => {
+    return DEFAULT_OT_OPERATIONS;
+  },
+
+  getAmbulances: async (): Promise<AmbulanceVehicle[]> => {
+    return DEFAULT_AMBULANCES;
+  },
+
+  getBloodBankStock: async (): Promise<BloodGroupStock[]> => {
+    return DEFAULT_BLOOD_STOCK;
+  },
+
   getSupplies: async (): Promise<SupplyItem[]> => {
     return DEFAULT_SUPPLIES;
   },
@@ -453,6 +676,13 @@ export const api = {
     const opCount = DEFAULT_EQUIPMENT.filter(e => e.status === 'Operational').length;
     const serviceCount = DEFAULT_EQUIPMENT.filter(e => e.status !== 'Operational').length;
 
+    const runningOps = DEFAULT_OT_OPERATIONS.filter(o => o.status === 'RUNNING').length;
+    const upcomingOps = DEFAULT_OT_OPERATIONS.filter(o => o.status === 'UPCOMING').length;
+    const completedOps = DEFAULT_OT_OPERATIONS.filter(o => o.status === 'COMPLETED').length;
+
+    const totalAmbUSD = DEFAULT_AMBULANCES.reduce((acc, a) => acc + a.monthlyCostUSD, 0);
+    const totalAmbINR = DEFAULT_AMBULANCES.reduce((acc, a) => acc + a.monthlyCostINR, 0);
+
     return {
       totalBeds,
       occupiedBeds,
@@ -464,9 +694,13 @@ export const api = {
       totalEmployeesCount: 142,
       employeesOnDutyCount: 142 - activeLeavesCount,
       employeesOnLeaveCount: activeLeavesCount,
-      activeAmbulancesReady: 4,
+      activeAmbulancesReady: DEFAULT_AMBULANCES.filter(a => a.status === 'Standby').length,
       oxygenLevelPercent: 96,
-      powerBackupStatus: '100% (Dual Diesel Gensets Standby)'
+      runningOperationsCount: runningOps,
+      upcomingOperationsCount: upcomingOps,
+      completedOperationsCount: completedOps,
+      totalAmbulanceMonthlyCostUSD: totalAmbUSD,
+      totalAmbulanceMonthlyCostINR: totalAmbINR
     };
   }
 };

@@ -4,13 +4,17 @@ import {
   ManagerStats,
   HospitalEquipment,
   WardBedAllocation,
+  RoomBedDetail,
+  OTLiveOperation,
+  AmbulanceVehicle,
+  BloodGroupStock,
   EmployeeLeaveRecord,
   SupplyItem
 } from '../types';
 import {
   Building2,
   Bed,
-  Cpu,
+  Scissors,
   Users,
   CalendarCheck2,
   Package,
@@ -21,21 +25,35 @@ import {
   ShieldCheck,
   Ambulance,
   Wind,
-  Zap,
   Droplet,
   Layers,
   Wrench,
   XCircle,
-  X
+  X,
+  DollarSign,
+  Filter,
+  PlayCircle,
+  Calendar,
+  AlertCircle
 } from 'lucide-react';
 
 export const ManagerView: React.FC = () => {
   const [stats, setStats] = useState<ManagerStats | null>(null);
-  const [equipmentList, setEquipmentList] = useState<HospitalEquipment[]>([]);
+  const [roomBeds, setRoomBeds] = useState<RoomBedDetail[]>([]);
   const [wardBeds, setWardBeds] = useState<WardBedAllocation[]>([]);
+  const [otOperations, setOtOperations] = useState<OTLiveOperation[]>([]);
+  const [ambulances, setAmbulances] = useState<AmbulanceVehicle[]>([]);
+  const [bloodStock, setBloodStock] = useState<BloodGroupStock[]>([]);
   const [leaveRecords, setLeaveRecords] = useState<EmployeeLeaveRecord[]>([]);
+  const [equipmentList, setEquipmentList] = useState<HospitalEquipment[]>([]);
   const [supplies, setSupplies] = useState<SupplyItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'EQUIPMENT' | 'BEDS' | 'LEAVES' | 'SUPPLIES'>('OVERVIEW');
+
+  // Sub-Tab Navigation
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'BEDS' | 'OPERATIONS' | 'AMBULANCES' | 'BLOOD' | 'LEAVES'>('OVERVIEW');
+
+  // Bed Filter States
+  const [selectedFloor, setSelectedFloor] = useState<string>('ALL');
+  const [bedAvailabilityFilter, setBedAvailabilityFilter] = useState<'ALL' | 'AVAILABLE_ONLY' | 'OCCUPIED_ONLY'>('ALL');
 
   // Reject Leave Modal State
   const [rejectingLeave, setRejectingLeave] = useState<EmployeeLeaveRecord | null>(null);
@@ -43,9 +61,13 @@ export const ManagerView: React.FC = () => {
 
   const loadData = () => {
     api.getManagerStats().then(setStats);
-    api.getEquipmentList().then(setEquipmentList);
+    api.getRoomBeds().then(setRoomBeds);
     api.getWardBeds().then(setWardBeds);
+    api.getOTOperations().then(setOtOperations);
+    api.getAmbulances().then(setAmbulances);
+    api.getBloodBankStock().then(setBloodStock);
     api.getEmployeeLeaves().then(setLeaveRecords);
+    api.getEquipmentList().then(setEquipmentList);
     api.getSupplies().then(setSupplies);
   };
 
@@ -73,6 +95,25 @@ export const ManagerView: React.FC = () => {
 
   if (!stats) return null;
 
+  // Filtered Room Beds
+  const filteredBeds = roomBeds.filter(b => {
+    const matchesFloor = selectedFloor === 'ALL' || b.floor.includes(selectedFloor);
+    const matchesAvail =
+      bedAvailabilityFilter === 'ALL' ||
+      (bedAvailabilityFilter === 'AVAILABLE_ONLY' && !b.isOccupied) ||
+      (bedAvailabilityFilter === 'OCCUPIED_ONLY' && b.isOccupied);
+    return matchesFloor && matchesAvail;
+  });
+
+  const occupiedCount = roomBeds.filter(b => b.isOccupied).length;
+  const availableCount = roomBeds.filter(b => !b.isOccupied).length;
+
+  const runningOps = otOperations.filter(o => o.status === 'RUNNING');
+  const upcomingOps = otOperations.filter(o => o.status === 'UPCOMING');
+  const completedOps = otOperations.filter(o => o.status === 'COMPLETED');
+
+  const depletedBloods = bloodStock.filter(b => b.status === 'Critical Shortage' || b.status === 'Depleted / Empty');
+
   return (
     <div className="space-y-6 font-sans w-full">
       {/* Manager Header Overview */}
@@ -81,16 +122,18 @@ export const ManagerView: React.FC = () => {
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900">Marcus Sterling, MHA — Hospital Operations & Facility Manager</h1>
             <span className="text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-0.5 rounded font-mono">
-              HOSPITAL MANAGEMENT CONTROL
+              HOSPITAL COMMAND CENTER
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">St. Jude Medical Center • Supervised Medical Equipment, 450 Bed Turnovers, Employee Leave Approvals/Rejections, and Emergency Supply Readiness</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-Time Floor Beds (Filled vs Kaliga), Live OT Surgeries, Ambulance Monthly Running Cost, and Blood Bank Inventory
+          </p>
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl text-right">
-            <span className="text-[10px] text-blue-800 font-semibold block">AMBULANCE FLEET READY</span>
-            <span className="text-base font-black text-blue-950">{stats.activeAmbulancesReady} Rapid Units Standby</span>
+          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-right">
+            <span className="text-[10px] text-rose-800 font-semibold block">LIVE OT SURGERIES RUNNING</span>
+            <span className="text-base font-black text-rose-950 animate-pulse">● {runningOps.length} Active in OT Suites</span>
           </div>
         </div>
       </div>
@@ -105,181 +148,206 @@ export const ManagerView: React.FC = () => {
         >
           Operations Overview
         </button>
-        <button
-          onClick={() => setActiveTab('EQUIPMENT')}
-          className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'EQUIPMENT' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
-          }`}
-        >
-          <span>Hospital Equipment & Biomed Assets</span>
-          <span className="text-[10px] font-mono bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded font-bold">
-            {equipmentList.length} Units
-          </span>
-        </button>
+
         <button
           onClick={() => setActiveTab('BEDS')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'BEDS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>Bed Inventory & 8 Wards</span>
-          <span className="text-[10px] font-mono bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded font-bold">
-            {stats.availableBeds} Free Beds
-          </span>
+          <Bed className="w-3.5 h-3.5 text-amber-700" />
+          <span>Floor & Room Beds ({availableCount} Kaliga / Free)</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('OPERATIONS')}
+          className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'OPERATIONS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+          }`}
+        >
+          <Scissors className="w-3.5 h-3.5 text-rose-700" />
+          <span>Live Operations (🔴 {runningOps.length} Running | 🟡 {upcomingOps.length} Upcoming)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('AMBULANCES')}
+          className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'AMBULANCES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+          }`}
+        >
+          <Ambulance className="w-3.5 h-3.5 text-blue-700" />
+          <span>Ambulances ({ambulances.length} Fleet & Monthly Cost)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('BLOOD')}
+          className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'BLOOD' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+          }`}
+        >
+          <Droplet className="w-3.5 h-3.5 text-rose-700" />
+          <span>Blood Bank ({depletedBloods.length} Urgent Depleted)</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('LEAVES')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'LEAVES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>Employee Leave Approvals / Rejections</span>
-          <span className="text-[10px] font-mono bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded font-bold">
-            {leaveRecords.filter(l => l.approvalStatus === 'Pending Review').length} Pending
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab('SUPPLIES')}
-          className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
-            activeTab === 'SUPPLIES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
-          }`}
-        >
-          Oxygen, Blood Bank & Supplies
+          <CalendarCheck2 className="w-3.5 h-3.5 text-purple-700" />
+          <span>Staff Leaves ({leaveRecords.filter(l => l.approvalStatus === 'Pending Review').length} Pending)</span>
         </button>
       </div>
 
-      {/* Top 4 KPI Metrics */}
+      {/* Top 4 Real-Time KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-xs w-full">
-        {/* 1. Bed Capacity */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
+        {/* 1. Bed Grid Status */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-amber-400" onClick={() => setActiveTab('BEDS')}>
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Hospital Bed Inventory</span>
+            <span className="font-semibold">Room & Bed Availability</span>
             <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
               <Bed className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">{stats.occupiedBeds} / {stats.totalBeds} Beds</div>
-          <p className="text-[11px] text-emerald-700 font-bold">{stats.availableBeds} Beds Ready for Admissions ({stats.bedOccupancyPercent}% Load)</p>
+          <div className="text-2xl font-black text-slate-900">{availableCount} Beds Kaliga (Free)</div>
+          <p className="text-[11px] text-slate-600 font-medium">{occupiedCount} Filled / Occupied Rooms Across All Floors</p>
         </div>
 
-        {/* 2. Medical Equipment Status */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
+        {/* 2. Operations Running / Upcoming */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-rose-400" onClick={() => setActiveTab('OPERATIONS')}>
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Biomedical Equipment</span>
+            <span className="font-semibold">Live OT Surgeries Tracker</span>
+            <div className="p-2 bg-rose-50 text-rose-700 rounded-xl">
+              <Scissors className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-rose-950">🔴 {runningOps.length} Running Now</div>
+          <p className="text-[11px] text-amber-800 font-semibold">🟡 {upcomingOps.length} Upcoming • 🟢 {completedOps.length} Done Today</p>
+        </div>
+
+        {/* 3. Ambulance Fleet & Monthly Cost */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-blue-400" onClick={() => setActiveTab('AMBULANCES')}>
+          <div className="flex justify-between items-center text-slate-500">
+            <span className="font-semibold">Ambulances & Monthly Cost</span>
             <div className="p-2 bg-blue-50 text-blue-700 rounded-xl">
-              <Cpu className="w-4 h-4" />
+              <Ambulance className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-blue-950">{stats.operationalEquipmentCount} / {stats.totalEquipmentCount} Operational</div>
-          <p className="text-[11px] text-blue-700 font-medium">{stats.equipmentNeedsServiceCount} Units Scheduled for Service / Calibration</p>
+          <div className="text-2xl font-black text-blue-950">${stats.totalAmbulanceMonthlyCostUSD.toLocaleString()} / mo</div>
+          <p className="text-[11px] text-blue-700 font-medium">₹{(stats.totalAmbulanceMonthlyCostINR / 100000).toFixed(2)} Lakhs/mo • 5 Vehicles Active</p>
         </div>
 
-        {/* 3. Employee Attendance & Leaves */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
+        {/* 4. Blood Bank Depleted Alert */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-rose-400" onClick={() => setActiveTab('BLOOD')}>
           <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Staff Attendance Today</span>
-            <div className="p-2 bg-purple-50 text-purple-700 rounded-xl">
-              <Users className="w-4 h-4" />
+            <span className="font-semibold">Blood Bank & Depletion Alert</span>
+            <div className="p-2 bg-rose-50 text-rose-700 rounded-xl">
+              <Droplet className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-purple-950">{stats.employeesOnDutyCount} / {stats.totalEmployeesCount} Present</div>
-          <p className="text-[11px] text-purple-800 font-medium">{stats.employeesOnLeaveCount} Staff on Approved Leave</p>
-        </div>
-
-        {/* 4. Critical Lifeline (Oxygen & Power) */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5">
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Oxygen & Power Reserves</span>
-            <div className="p-2 bg-teal-50 text-teal-700 rounded-xl">
-              <Zap className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-teal-950">{stats.oxygenLevelPercent}% O2 Level</div>
-          <p className="text-[11px] text-teal-800 font-medium">Dual Diesel Backup Generator Online</p>
+          <div className="text-2xl font-black text-rose-950">{depletedBloods.length} Groups Depleted</div>
+          <p className="text-[11px] text-rose-700 font-bold">O-ve (2 units left) & AB-ve (Empty)</p>
         </div>
       </div>
 
       {/* TAB 1: OPERATIONS OVERVIEW */}
       {activeTab === 'OVERVIEW' && (
         <div className="space-y-6">
-          {/* Facility Telemetry Bar */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div>
-                <h3 className="font-bold text-sm text-slate-900">Hospital Facility & Infrastructure Health</h3>
-                <p className="text-[11px] text-slate-500">Real-time status of hospital energy, air filtration, ambulances, and clinical utilities</p>
+          {/* Quick Shortcuts to 4 Requested Modules */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            {/* 1. Bed Grid Shortcut */}
+            <div
+              onClick={() => setActiveTab('BEDS')}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-amber-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+            >
+              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <Bed className="w-4 h-4 text-amber-700" />
+                <span>Floor & Room Beds</span>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
-                All Infrastructure Stable
-              </span>
+              <p className="text-slate-500 text-[11px]">
+                Detailed floor matrix showing exact room numbers, occupied beds with patient names, and available free beds.
+              </p>
+              <span className="text-amber-800 font-bold block pt-1 text-[11px]">Open Bed Layout →</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="flex items-center gap-1.5 text-blue-800 font-bold">
-                  <Ambulance className="w-4 h-4" />
-                  <span>Ambulance Response</span>
-                </div>
-                <div className="text-xl font-black text-slate-900">4 Standby / 1 Transit</div>
-                <span className="text-[10px] text-emerald-700 font-bold">Average Response: 6 mins</span>
+            {/* 2. Operations Shortcut */}
+            <div
+              onClick={() => setActiveTab('OPERATIONS')}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-rose-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+            >
+              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <Scissors className="w-4 h-4 text-rose-700" />
+                <span>Live OT Surgeries</span>
               </div>
+              <p className="text-slate-500 text-[11px]">
+                Real-time tracking of surgeries running right now in OT suites, upcoming afternoon cases, and completed surgeries.
+              </p>
+              <span className="text-rose-800 font-bold block pt-1 text-[11px]">View OT Suites Status →</span>
+            </div>
 
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="flex items-center gap-1.5 text-teal-800 font-bold">
-                  <Wind className="w-4 h-4" />
-                  <span>OT HEPA Air Filtration</span>
-                </div>
-                <div className="text-xl font-black text-slate-900">99.97% Purity</div>
-                <span className="text-[10px] text-slate-500 font-mono">Positive Pressure Maintained</span>
+            {/* 3. Ambulance Cost Shortcut */}
+            <div
+              onClick={() => setActiveTab('AMBULANCES')}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-blue-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+            >
+              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <Ambulance className="w-4 h-4 text-blue-700" />
+                <span>Ambulances & Monthly Cost</span>
               </div>
+              <p className="text-slate-500 text-[11px]">
+                5 Active ambulance fleet with breakdown of fuel, driver salaries, life support maintenance, and total monthly cost.
+              </p>
+              <span className="text-blue-800 font-bold block pt-1 text-[11px]">View Cost Breakdown →</span>
+            </div>
 
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="flex items-center gap-1.5 text-rose-700 font-bold">
-                  <Droplet className="w-4 h-4" />
-                  <span>Blood Bank (O-ve)</span>
-                </div>
-                <div className="text-xl font-black text-slate-900">28 Units</div>
-                <span className="text-[10px] text-emerald-700 font-bold">Safe Emergency Reserve</span>
+            {/* 4. Blood Bank Shortcut */}
+            <div
+              onClick={() => setActiveTab('BLOOD')}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-rose-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+            >
+              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <Droplet className="w-4 h-4 text-rose-700" />
+                <span>Blood Bank & Urgent Demand</span>
               </div>
-
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="flex items-center gap-1.5 text-amber-800 font-bold">
-                  <Zap className="w-4 h-4" />
-                  <span>Dual Backup Gensets</span>
-                </div>
-                <div className="text-xl font-black text-slate-900">100% Ready</div>
-                <span className="text-[10px] text-slate-500 font-mono">72 Hours Continuous Fuel</span>
-              </div>
+              <p className="text-slate-500 text-[11px]">
+                Stock levels for all 8 blood groups, depleted groups alert, and next urgent blood units needed for surgeries.
+              </p>
+              <span className="text-rose-800 font-bold block pt-1 text-[11px]">View Blood Matrix →</span>
             </div>
           </div>
 
-          {/* Quick Previews */}
+          {/* Quick Previews: Running Surgeries & Pending Staff Leaves */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
-            {/* Equipment Alerts */}
+            {/* Live Surgeries Mini-Board */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-amber-700" />
-                  <h4 className="font-bold text-sm text-slate-900">Equipment Calibration & Maintenance Alerts</h4>
+                  <Scissors className="w-4 h-4 text-rose-700" />
+                  <h4 className="font-bold text-sm text-slate-900">Live Surgeries in OT Suites (Running Now)</h4>
                 </div>
-                <button onClick={() => setActiveTab('EQUIPMENT')} className="text-xs font-bold text-blue-700 hover:underline cursor-pointer">
-                  Manage All →
+                <button onClick={() => setActiveTab('OPERATIONS')} className="text-xs font-bold text-rose-700 hover:underline cursor-pointer">
+                  All OT Cases →
                 </button>
               </div>
 
-              <div className="space-y-2">
-                {equipmentList.filter(e => e.status !== 'Operational').map(eq => (
-                  <div key={eq.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs">
-                    <div>
-                      <span className="font-bold text-slate-900">{eq.name}</span>
-                      <p className="text-[11px] text-slate-500">{eq.location} • In-Charge: {eq.technicianInCharge}</p>
-                      <span className="text-[10px] text-amber-800 font-semibold">{eq.nextServiceDue}</span>
+              <div className="space-y-2.5">
+                {runningOps.map(op => (
+                  <div key={op.id} className="p-4 bg-rose-50/50 border border-rose-200 rounded-xl space-y-1.5 text-xs">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-mono font-bold text-[10px] text-rose-800 bg-rose-100 px-2 py-0.5 rounded">
+                          {op.otSuite}
+                        </span>
+                        <h5 className="font-bold text-slate-900 text-sm mt-1">{op.procedureName}</h5>
+                      </div>
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-rose-600 text-white font-mono animate-pulse">
+                        🔴 IN PROGRESS ({op.elapsedMinutes} mins elapsed)
+                      </span>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      eq.status === 'Maintenance Due' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-800 border border-blue-200'
-                    }`}>
-                      {eq.status}
-                    </span>
+                    <p className="text-slate-600 text-[11px]">
+                      Patient: <strong>{op.patientName}</strong> ({op.patientAge}y) • Lead Surgeon: <strong>{op.primarySurgeon}</strong>
+                    </p>
                   </div>
                 ))}
               </div>
@@ -290,7 +358,7 @@ export const ManagerView: React.FC = () => {
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-2">
                   <CalendarCheck2 className="w-4 h-4 text-purple-700" />
-                  <h4 className="font-bold text-sm text-slate-900">Employee Leave Approvals / Rejections</h4>
+                  <h4 className="font-bold text-sm text-slate-900">Employee Leave Requests Pending Decision</h4>
                 </div>
                 <button onClick={() => setActiveTab('LEAVES')} className="text-xs font-bold text-purple-700 hover:underline cursor-pointer">
                   Manage All Leaves →
@@ -306,7 +374,6 @@ export const ManagerView: React.FC = () => {
                         <span className="text-[10px] font-mono bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-semibold">{lv.role}</span>
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5">{lv.reason} ({lv.startDate} - {lv.endDate})</p>
-                      <p className="text-[10px] text-emerald-800 font-semibold">Cover: {lv.substituteCover}</p>
                     </div>
 
                     {lv.approvalStatus === 'Pending Review' ? (
@@ -339,51 +406,116 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: HOSPITAL EQUIPMENT & BIOMEDICAL ASSETS */}
-      {activeTab === 'EQUIPMENT' && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+      {/* TAB 2: FLOOR & ROOM BEDS LAYOUT (FILLED VS KALIGA / AVAILABLE) */}
+      {activeTab === 'BEDS' && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
             <div>
-              <h3 className="font-bold text-base text-slate-900">Hospital Equipment & Biomedical Machinery Registry</h3>
-              <p className="text-xs text-slate-500">Track critical imaging, ventilators, surgical robotics, and dialysis equipment maintenance cycles</p>
+              <h3 className="font-bold text-base text-slate-900">Hospital Floor & Room Bed Availability Grid</h3>
+              <p className="text-xs text-slate-500">
+                Detailed room-by-room status: check which rooms and beds are <strong>Filled (Occupied)</strong> vs <strong>Kaliga (Free for instant admission)</strong>
+              </p>
             </div>
-            <span className="text-xs font-mono font-bold bg-blue-50 text-blue-900 border border-blue-200 px-3 py-1 rounded-xl">
-              {equipmentList.length} High-Value Assets
-            </span>
+
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold">
+                🟢 {availableCount} Beds Kaliga (Free)
+              </span>
+              <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold">
+                🔴 {occupiedCount} Beds Filled
+              </span>
+            </div>
           </div>
 
+          {/* Filter Controls: Floors & Availability */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+            {/* Floor Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="font-bold text-slate-600 mr-1">Select Floor:</span>
+              {['ALL', 'Ground Floor', 'Floor 1', 'Floor 2', 'Floor 3', 'Floor 4'].map(fl => (
+                <button
+                  key={fl}
+                  onClick={() => setSelectedFloor(fl)}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                    selectedFloor === fl ? 'bg-slate-900 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  {fl === 'ALL' ? 'All Floors' : fl}
+                </button>
+              ))}
+            </div>
+
+            {/* Availability Filter */}
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-slate-600 mr-1">Status:</span>
+              <select
+                value={bedAvailabilityFilter}
+                onChange={e => setBedAvailabilityFilter(e.target.value as any)}
+                className="p-1.5 bg-white border border-slate-200 rounded-lg font-medium outline-none"
+              >
+                <option value="ALL">Show All Beds (Filled + Kaliga)</option>
+                <option value="AVAILABLE_ONLY">🟢 Kaliga / Free Beds Only</option>
+                <option value="OCCUPIED_ONLY">🔴 Filled / Occupied Beds Only</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Room-by-Room Beds Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-            {equipmentList.map(eq => (
-              <div key={eq.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 flex flex-col justify-between">
-                <div className="space-y-1.5">
+            {filteredBeds.map(bed => (
+              <div
+                key={bed.id}
+                className={`p-5 rounded-2xl border space-y-3 flex flex-col justify-between transition-all ${
+                  bed.isOccupied
+                    ? 'bg-slate-50/70 border-slate-300'
+                    : 'bg-emerald-50/30 border-emerald-200 shadow-xs hover:border-emerald-500'
+                }`}
+              >
+                <div className="space-y-2">
                   <div className="flex justify-between items-start">
-                    <span className="font-mono font-bold text-[10px] text-slate-400">{eq.id}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      eq.status === 'Operational' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
-                      eq.status === 'Maintenance Due' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
-                      'bg-blue-50 text-blue-800 border border-blue-200'
+                    <div>
+                      <span className="font-mono font-bold text-[10px] text-slate-400 block">{bed.floor} • {bed.wardName}</span>
+                      <h4 className="font-black text-slate-900 text-base mt-0.5">{bed.roomNumber} ({bed.bedNumber})</h4>
+                    </div>
+
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
+                      bed.isOccupied
+                        ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                        : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                     }`}>
-                      ● {eq.status}
+                      {bed.isOccupied ? '🔴 FILLED / OCCUPIED' : '🟢 KALIGA / AVAILABLE'}
                     </span>
                   </div>
-                  <h4 className="font-bold text-sm text-slate-900">{eq.name}</h4>
-                  <p className="text-[11px] text-slate-500">Model: {eq.model}</p>
-                  <p className="text-[11px] text-slate-600">Location: <strong>{eq.location}</strong></p>
+
+                  <div className="p-2.5 bg-white rounded-xl border border-slate-200/80 text-[11px] space-y-1">
+                    <span className="text-[10px] font-mono font-bold text-slate-400 block uppercase">Bed Specification</span>
+                    <p className="font-bold text-slate-800">{bed.bedType}</p>
+                  </div>
+
+                  {/* Patient Details if Occupied */}
+                  {bed.isOccupied ? (
+                    <div className="p-3 bg-white rounded-xl border border-rose-100 space-y-1 text-[11px] text-slate-700">
+                      <div className="flex justify-between items-center font-bold text-slate-900">
+                        <span>Patient: {bed.patientName}</span>
+                        <span className="font-mono text-[10px] text-slate-500">{bed.patientAge}y, {bed.patientGender}</span>
+                      </div>
+                      <p className="text-slate-600">Diagnosis: <strong>{bed.diagnosis}</strong></p>
+                      <p className="text-slate-500">Attending: {bed.attendingDoctor}</p>
+                      <p className="text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-100">Admitted: {bed.admittedDate}</p>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-[11px] text-emerald-950 space-y-0.5">
+                      <span className="font-bold block">✓ Ready for Immediate Admission</span>
+                      <p className="text-emerald-800">Sterilized, sanitized, linen changed, monitor linked.</p>
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 space-y-0.5 font-mono">
-                  <div className="flex justify-between">
-                    <span>Last Service:</span>
-                    <span className="text-slate-700">{eq.lastServiced}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold">
-                    <span>Next Due:</span>
-                    <span className={eq.status !== 'Operational' ? 'text-amber-800' : 'text-slate-700'}>{eq.nextServiceDue}</span>
-                  </div>
-                  <div className="flex justify-between text-[10px] pt-1 text-slate-400">
-                    <span>Technician:</span>
-                    <span>{eq.technicianInCharge}</span>
-                  </div>
+                <div className="pt-2 border-t border-slate-200/60 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                  <span>BED ID: {bed.id}</span>
+                  <span className={bed.isOccupied ? 'text-rose-700 font-bold' : 'text-emerald-700 font-bold'}>
+                    {bed.isOccupied ? 'Bed in Clinical Use' : 'Ready to Admit'}
+                  </span>
                 </div>
               </div>
             ))}
@@ -391,59 +523,315 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: BED INVENTORY & 8 WARD ALLOCATIONS */}
-      {activeTab === 'BEDS' && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+      {/* TAB 3: LIVE OPERATIONS (RUNNING NOW, UPCOMING TODAY, COMPLETED) */}
+      {activeTab === 'OPERATIONS' && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-4">
             <div>
-              <h3 className="font-bold text-base text-slate-900">Hospital Bed Capacity & Ward Allocation Matrix</h3>
-              <p className="text-xs text-slate-500">Total 450 Licensed Beds across ICU, Cardiac, Orthopedic, General, Pediatrics, and ER Wards</p>
+              <h3 className="font-bold text-base text-slate-900">Operation Theatre (OT) Suites Command Matrix</h3>
+              <p className="text-xs text-slate-500">
+                Live monitoring of all surgery theatres: running right now, scheduled upcoming cases, and completed surgeries
+              </p>
             </div>
-            <div className="text-right text-xs font-mono">
-              <span className="text-slate-500 font-normal block">TOTAL OCCUPIED</span>
-              <strong className="text-slate-900">{stats.occupiedBeds} / {stats.totalBeds} ({stats.bedOccupancyPercent}%)</strong>
+
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold">
+                🔴 {runningOps.length} Running
+              </span>
+              <span className="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-xl font-bold">
+                🟡 {upcomingOps.length} Upcoming
+              </span>
+              <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold">
+                🟢 {completedOps.length} Completed
+              </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            {wardBeds.map(ward => {
-              const occupancy = Math.round((ward.occupiedBeds / ward.totalBeds) * 100);
-              return (
-                <div key={ward.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <span className="font-mono font-bold text-[10px] text-slate-400">{ward.id} • {ward.floor}</span>
-                    <h4 className="font-bold text-slate-900 text-sm">{ward.wardName}</h4>
-                    <p className="text-[11px] text-slate-500">Lead Nurse: <strong>{ward.headNurse}</strong></p>
+          {/* 1. RUNNING NOW (LIVE IN OT) */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-rose-800">
+              <PlayCircle className="w-4 h-4 text-rose-600 animate-pulse" />
+              <span>🔴 Surgeries Running Right Now in OT Suites ({runningOps.length})</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {runningOps.map(op => (
+                <div key={op.id} className="p-5 bg-rose-50/40 border-2 border-rose-300 rounded-2xl space-y-3 shadow-xs">
+                  <div className="flex justify-between items-start">
+                    <span className="font-mono font-bold text-[10px] text-rose-900 bg-rose-100 px-2.5 py-0.5 rounded border border-rose-300">
+                      {op.otSuite}
+                    </span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-rose-600 text-white font-mono animate-pulse">
+                      ● RUNNING ({op.elapsedMinutes}m / {op.durationMinutes}m)
+                    </span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-slate-500 font-medium">Beds Occupied:</span>
-                      <span className="font-bold text-slate-900">{ward.occupiedBeds} / {ward.totalBeds}</span>
-                    </div>
+                  <div>
+                    <h4 className="font-bold text-base text-slate-900">{op.procedureName}</h4>
+                    <p className="text-slate-600 text-[11px] mt-0.5">
+                      Patient: <strong>{op.patientName}</strong> ({op.patientAge} years old)
+                    </p>
+                    <p className="text-rose-950 font-semibold text-[11px]">
+                      Lead Surgeon: <strong>{op.primarySurgeon}</strong>
+                    </p>
+                    <p className="text-slate-500 text-[10px]">Assisting Team: {op.assistingTeam}</p>
+                  </div>
 
-                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          occupancy > 90 ? 'bg-rose-600' : occupancy > 75 ? 'bg-amber-500' : 'bg-emerald-600'
-                        }`}
-                        style={{ width: `${occupancy}%` }}
-                      ></div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-200/60 text-[10px] font-mono">
-                      <span className="text-emerald-700 font-bold">{ward.availableBeds} Beds Free</span>
-                      <span className="text-slate-500">{ward.ventilatorCount} Ventilators</span>
-                    </div>
+                  <div className="p-3 bg-white rounded-xl border border-rose-200 text-[11px] text-slate-800">
+                    <span className="font-bold block text-rose-900">Live Clinical Progress:</span>
+                    <p>{op.clinicalNotes}</p>
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          {/* 2. UPCOMING SCHEDULED TODAY */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-sm font-bold text-amber-800">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>🟡 Upcoming Scheduled Surgeries Today ({upcomingOps.length})</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {upcomingOps.map(op => (
+                <div key={op.id} className="p-5 bg-amber-50/30 border border-amber-200 rounded-2xl space-y-3">
+                  <div className="flex justify-between items-start">
+                    <span className="font-mono font-bold text-[10px] text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
+                      {op.otSuite} • {op.scheduledTime}
+                    </span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 font-mono">
+                      🟡 UPCOMING
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-base text-slate-900">{op.procedureName}</h4>
+                    <p className="text-slate-600 text-[11px] mt-0.5">
+                      Patient: <strong>{op.patientName}</strong> ({op.patientAge} years old)
+                    </p>
+                    <p className="text-slate-800 font-semibold text-[11px]">
+                      Scheduled Surgeon: <strong>{op.primarySurgeon}</strong>
+                    </p>
+                    <p className="text-slate-500 text-[10px]">Team: {op.assistingTeam}</p>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-xl border border-amber-200 text-[11px] text-slate-700">
+                    <span className="font-bold block text-amber-900">Pre-Op Preparation:</span>
+                    <p>{op.clinicalNotes}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. COMPLETED TODAY */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-sm font-bold text-emerald-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>🟢 Completed Surgeries Shifted to Recovery ({completedOps.length})</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {completedOps.map(op => (
+                <div key={op.id} className="p-5 bg-emerald-50/30 border border-emerald-200 rounded-2xl space-y-2.5">
+                  <div className="flex justify-between items-start">
+                    <span className="font-mono font-bold text-[10px] text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-300">
+                      {op.otSuite} • {op.scheduledTime}
+                    </span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 font-mono">
+                      ✓ COMPLETED
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">{op.procedureName}</h4>
+                    <p className="text-slate-600 text-[11px]">
+                      Patient: <strong>{op.patientName}</strong> ({op.patientAge}y) • Surgeon: {op.primarySurgeon}
+                    </p>
+                  </div>
+
+                  <div className="p-2.5 bg-white rounded-xl border border-emerald-200 text-[11px] text-slate-700">
+                    <p>{op.clinicalNotes}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* TAB 4: EMPLOYEE LEAVES MANAGEMENT (ACCEPT OR REJECT) */}
+      {/* TAB 4: AMBULANCE FLEET & MONTHLY COST (YENNI WORK AVUTUNAYE & MONTH COST) */}
+      {activeTab === 'AMBULANCES' && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="font-bold text-base text-slate-900">Hospital Ambulance Fleet & Monthly Operating Cost Breakdown</h3>
+              <p className="text-xs text-slate-500">
+                Track live ambulance telemetry, fuel expenses, certified EMT drivers, life support maintenance, and total monthly operating costs
+              </p>
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-right font-mono">
+              <span className="text-[10px] text-blue-800 font-bold block">TOTAL FLEET MONTHLY COST</span>
+              <span className="text-lg font-black text-blue-950">
+                ${stats.totalAmbulanceMonthlyCostUSD.toLocaleString()} / Month (₹{(stats.totalAmbulanceMonthlyCostINR / 100000).toFixed(2)} Lakhs)
+              </span>
+            </div>
+          </div>
+
+          {/* Monthly Running Cost Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span className="text-slate-500 font-semibold block">Total Active Ambulances</span>
+              <div className="text-2xl font-black text-slate-900">{ambulances.length} Emergency Units</div>
+              <span className="text-[10px] text-emerald-700 font-bold">3 Standby • 1 In Transit • 1 Workshop</span>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span className="text-slate-500 font-semibold block">Monthly Fuel & Diesel Cost</span>
+              <div className="text-2xl font-black text-blue-900">$2,700 / mo</div>
+              <span className="text-[10px] text-slate-500 font-mono">₹2.21 Lakhs (24/7 Engine Readiness)</span>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span className="text-slate-500 font-semibold block">EMT Driver & Paramedic Salaries</span>
+              <div className="text-2xl font-black text-purple-900">$6,300 / mo</div>
+              <span className="text-[10px] text-slate-500 font-mono">₹5.16 Lakhs (10 Shift Staff)</span>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span className="text-slate-500 font-semibold block">Life Support & Vehicle Maintenance</span>
+              <div className="text-2xl font-black text-teal-900">$2,500 / mo</div>
+              <span className="text-[10px] text-slate-500 font-mono">₹2.05 Lakhs (Defibrillator & O2 Cert)</span>
+            </div>
+          </div>
+
+          {/* Ambulance Vehicles Detailed Register */}
+          <div className="space-y-3">
+            <h4 className="font-bold text-sm text-slate-900">Registered Ambulances & Operational Telemetry:</h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {ambulances.map(amb => (
+                <div key={amb.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-mono font-bold text-[10px] text-slate-400">{amb.id} • {amb.vehicleNumber}</span>
+                        <h5 className="font-bold text-base text-slate-900 mt-0.5">{amb.type}</h5>
+                      </div>
+
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
+                        amb.status === 'Standby' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                        amb.status === 'In Transit (Emergency)' ? 'bg-rose-100 text-rose-900 border border-rose-300 animate-pulse' :
+                        'bg-amber-100 text-amber-900 border border-amber-300'
+                      }`}>
+                        ● {amb.status}
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 text-[11px] space-y-1 text-slate-700">
+                      <p>Driver: <strong>{amb.driverName}</strong></p>
+                      <p>Paramedic Lead: <strong>{amb.paramedicLead}</strong></p>
+                      <p className="text-slate-500 font-mono text-[10px]">Location: {amb.currentLocation}</p>
+                    </div>
+
+                    {/* Cost Breakdown */}
+                    <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200 text-[11px] space-y-1">
+                      <span className="font-bold text-blue-950 block">Monthly Operating Cost:</span>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Fuel Expense: ${amb.fuelExpense}</span>
+                        <span>Staff Salary: ${amb.staffSalary}</span>
+                        <span>Maintenance: ${amb.maintenanceExpense}</span>
+                      </div>
+                      <div className="flex justify-between font-bold text-blue-900 pt-1 border-t border-blue-200 text-xs font-mono">
+                        <span>Total Monthly:</span>
+                        <span>${amb.monthlyCostUSD.toLocaleString()} / mo (₹{amb.monthlyCostINR.toLocaleString()})</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: BLOOD BANK MATRIX (AVAILABLE, DEPLETED, AND NEXT NEEDED) */}
+      {activeTab === 'BLOOD' && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="font-bold text-base text-slate-900">Blood Bank Inventory & Depletion Demand Matrix</h3>
+              <p className="text-xs text-slate-500">
+                Monitor available blood units by group, identify depleted / out of stock groups, and calculate urgent demand for surgeries
+              </p>
+            </div>
+
+            <button
+              onClick={() => alert('Emergency Blood Request broadcasted to Red Cross Regional Blood Bank and Volunteer Donor Network!')}
+              className="px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Droplet className="w-3.5 h-3.5" />
+              <span>Broadcast Emergency Blood Drive</span>
+            </button>
+          </div>
+
+          {/* Blood Groups Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            {bloodStock.map(b => (
+              <div
+                key={b.group}
+                className={`p-5 rounded-2xl border space-y-3 flex flex-col justify-between ${
+                  b.status === 'Optimal' ? 'bg-slate-50 border-slate-200' :
+                  b.status === 'Adequate' ? 'bg-blue-50/40 border-blue-200' :
+                  'bg-rose-50/50 border-2 border-rose-400 shadow-xs'
+                }`}
+              >
+                <div className="space-y-2">
+                  <div className="flex justify-between items-start">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center font-black text-xl text-rose-700 shadow-xs font-mono">
+                      {b.group}
+                    </div>
+
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
+                      b.status === 'Optimal' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                      b.status === 'Adequate' ? 'bg-blue-100 text-blue-900 border border-blue-300' :
+                      'bg-rose-600 text-white animate-pulse'
+                    }`}>
+                      {b.status}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-mono text-slate-500 block">AVAILABLE IN STORAGE</span>
+                    <div className="text-2xl font-black text-slate-900">{b.unitsAvailable} Units</div>
+                    <p className="text-[11px] text-slate-500">Safe Target: {b.safeReserveTarget} Units</p>
+                  </div>
+
+                  {/* Urgent Demand & Reason if Depleted */}
+                  {b.urgentUnitsNeeded > 0 && (
+                    <div className="p-3 bg-white rounded-xl border border-rose-200 text-[11px] space-y-1 text-rose-950 font-medium">
+                      <span className="font-bold text-rose-700 block">Next Urgent Demand Needed:</span>
+                      <p className="font-black text-sm text-rose-700 font-mono">+{b.urgentUnitsNeeded} Units Required Immediately</p>
+                      <p className="text-[10px] leading-relaxed text-slate-700 pt-1 border-t border-rose-100">{b.urgentReason}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-400 flex justify-between">
+                  <span>Group: {b.group}</span>
+                  <span className={b.unitsAvailable < 5 ? 'text-rose-700 font-bold' : 'text-emerald-700 font-bold'}>
+                    {b.unitsAvailable < 5 ? 'Restock Immediately' : 'Stock Stable'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: EMPLOYEE LEAVES MANAGEMENT (ACCEPT OR REJECT) */}
       {activeTab === 'LEAVES' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -507,47 +895,6 @@ export const ManagerView: React.FC = () => {
                       ● {lv.approvalStatus === 'Approved' ? '✓ Accepted by Manager' : '✗ Rejected by Manager'}
                     </span>
                   )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: SUPPLIES, OXYGEN & BLOOD BANK */}
-      {activeTab === 'SUPPLIES' && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-            <div>
-              <h3 className="font-bold text-base text-slate-900">Hospital Critical Supplies, Oxygen & Pharmacy Inventory</h3>
-              <p className="text-xs text-slate-500">Monitor stock levels of cryogenic oxygen, blood units, IV fluids, and ICU emergency medication</p>
-            </div>
-            <span className="text-xs font-mono font-bold bg-teal-50 text-teal-900 border border-teal-200 px-3 py-1 rounded-xl">
-              100% Emergency Stock Readiness
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-            {supplies.map(sup => (
-              <div key={sup.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 flex flex-col justify-between">
-                <div className="space-y-1">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-mono text-slate-400">{sup.category}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      sup.status === 'Optimal' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
-                      sup.status === 'Adequate' ? 'bg-blue-50 text-blue-800 border border-blue-200' :
-                      'bg-amber-50 text-amber-800 border border-amber-200'
-                    }`}>
-                      {sup.status}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm text-slate-900">{sup.itemName}</h4>
-                  <p className="text-xs font-bold text-slate-800 font-mono mt-1">{sup.currentStock}</p>
-                </div>
-
-                <div className="pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-500 flex justify-between">
-                  <span>Reorder Threshold:</span>
-                  <span className="font-bold text-slate-700">{sup.reorderLevel}</span>
                 </div>
               </div>
             ))}

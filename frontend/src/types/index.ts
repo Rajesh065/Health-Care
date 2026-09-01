@@ -70,6 +70,61 @@ export interface WardBedAllocation {
   ventilatorCount: number;
 }
 
+export interface RoomBedDetail {
+  id: string;
+  floor: string;
+  wardName: string;
+  roomNumber: string;
+  bedNumber: string;
+  bedType: 'ICU Ventilator Bed' | 'Deluxe Private Bed' | 'Semi-Private Bed' | 'General Ward Bed' | 'Emergency Triage Bed';
+  isOccupied: boolean;
+  patientName?: string;
+  patientAge?: number;
+  patientGender?: string;
+  admittedDate?: string;
+  attendingDoctor?: string;
+  diagnosis?: string;
+}
+
+export interface OTLiveOperation {
+  id: string;
+  procedureName: string;
+  patientName: string;
+  patientAge: number;
+  primarySurgeon: string;
+  otSuite: string;
+  status: 'RUNNING' | 'UPCOMING' | 'COMPLETED';
+  scheduledTime: string;
+  durationMinutes: number;
+  elapsedMinutes?: number;
+  assistingTeam: string;
+  clinicalNotes?: string;
+}
+
+export interface AmbulanceVehicle {
+  id: string;
+  vehicleNumber: string;
+  type: 'Advanced Cardiac ICU Life Support (ACLS)' | 'Basic Life Support (BLS)' | 'Neonatal Emergency Transport';
+  status: 'Standby' | 'In Transit (Emergency)' | 'Under Maintenance';
+  driverName: string;
+  paramedicLead: string;
+  currentLocation: string;
+  monthlyCostUSD: number;
+  monthlyCostINR: number;
+  fuelExpense: number;
+  staffSalary: number;
+  maintenanceExpense: number;
+}
+
+export interface BloodGroupStock {
+  group: 'A+' | 'A-' | 'B+' | 'B-' | 'O+' | 'O-' | 'AB+' | 'AB-';
+  unitsAvailable: number;
+  safeReserveTarget: number;
+  status: 'Optimal' | 'Adequate' | 'Critical Shortage' | 'Depleted / Empty';
+  urgentUnitsNeeded: number;
+  urgentReason?: string;
+}
+
 export interface EmployeeLeaveRecord {
   id: string;
   employeeName: string;
@@ -132,5 +187,9 @@ export interface ManagerStats {
   employeesOnLeaveCount: number;
   activeAmbulancesReady: number;
   oxygenLevelPercent: number;
-  powerBackupStatus: string;
+  runningOperationsCount: number;
+  upcomingOperationsCount: number;
+  completedOperationsCount: number;
+  totalAmbulanceMonthlyCostUSD: number;
+  totalAmbulanceMonthlyCostINR: number;
 }
