@@ -3,7 +3,8 @@ import {
   InpatientAdmitRecord,
   DischargeRecord,
   MDStats,
-  MedicalDomain
+  MedicalDomain,
+  StaffAttendanceRecord
 } from '../types';
 
 export const MEDICAL_DOMAINS: MedicalDomain[] = [
@@ -81,8 +82,6 @@ export const MEDICAL_DOMAINS: MedicalDomain[] = [
   }
 ];
 
-const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v8';
-
 const DEFAULT_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-101',
@@ -149,6 +148,21 @@ const DEFAULT_DISCHARGES: DischargeRecord[] = [
   { id: 'DIS-202', patientId: 'PT-55102', patientName: 'Karen White', age: 42, ward: 'Orthopedic Recovery', dischargeTime: '10:30 AM Today', doctorApproved: 'Dr. Sarah Jenkins', summary: 'Post-arthroscopic knee repair recovery successful. Physiotherapy chart issued.' },
   { id: 'DIS-203', patientId: 'PT-33910', patientName: 'Richard Roe', age: 67, ward: 'Cardiac Step-Down', dischargeTime: '11:45 AM Today', doctorApproved: 'Dr. Maya Lin', summary: 'Post-angioplasty 48-hour monitoring cleared. Cardiac rehab schedule provided.' }
 ];
+
+const DEFAULT_STAFF: StaffAttendanceRecord[] = [
+  { id: 'STF-01', name: 'Dr. Maya Lin, MD', role: 'Chief Cardiologist', department: 'Cardiology', status: 'ON_DUTY', shiftTime: '08:00 AM - 04:00 PM' },
+  { id: 'STF-02', name: 'Dr. David Kim, MD', role: 'Chief Neurologist', department: 'Neurology', status: 'ON_DUTY', shiftTime: '09:00 AM - 05:00 PM' },
+  { id: 'STF-03', name: 'Dr. Sarah Jenkins, MD', role: 'Orthopedic Surgeon', department: 'Orthopedics & OT', status: 'ON_DUTY', shiftTime: '08:30 AM - 04:30 PM (Operating Room)' },
+  { id: 'STF-04', name: 'Dr. Emily Watson, MD', role: 'Senior Pediatrician', department: 'Pediatrics', status: 'ON_DUTY', shiftTime: '08:00 AM - 04:00 PM' },
+  { id: 'STF-05', name: 'Dr. Rajesh Patel, MD', role: 'Medical Oncologist', department: 'Oncology', status: 'ON_DUTY', shiftTime: '10:00 AM - 06:00 PM' },
+  { id: 'STF-06', name: 'Dr. Marcus Reed, MD', role: 'Pulmonologist', department: 'Pulmonology', status: 'ON_LEAVE', leaveReason: 'Attending Medical Research Symposium', substituteCover: 'Dr. Arthur Sterling (MD)' },
+  { id: 'STF-07', name: 'Nurse Sarah Connor, RN', role: 'ICU Head Nurse', department: 'Critical Care ICU', status: 'ON_DUTY', shiftTime: '07:00 AM - 03:00 PM' },
+  { id: 'STF-08', name: 'Nurse Jessica Alba, RN', role: 'Cardiac Ward Lead Nurse', department: 'Cardiac Ward', status: 'ON_DUTY', shiftTime: '07:00 AM - 03:00 PM' },
+  { id: 'STF-09', name: 'Priya Nair', role: 'Front Desk Lead', department: 'Reception & Tokens', status: 'ON_DUTY', shiftTime: '08:00 AM - 05:00 PM' },
+  { id: 'STF-10', name: 'Dr. Kevin O\'Connor, MD', role: 'Nephrologist', department: 'Renal Dialysis', status: 'ON_LEAVE', leaveReason: 'Approved Personal Medical Leave', substituteCover: 'Dr. David Kim (On-Call)' }
+];
+
+const STORAGE_KEY_APTS = 'medflow_hospital_appointments_v9';
 
 function getApts(): Appointment[] {
   const saved = localStorage.getItem(STORAGE_KEY_APTS);
@@ -267,15 +281,35 @@ export const api = {
     return DEFAULT_DISCHARGES;
   },
 
+  getStaffAttendance: async (): Promise<StaffAttendanceRecord[]> => {
+    return DEFAULT_STAFF;
+  },
+
   getMDStats: async (): Promise<MDStats> => {
+    const onDuty = DEFAULT_STAFF.filter(s => s.status === 'ON_DUTY').length;
+    const onLeave = DEFAULT_STAFF.filter(s => s.status === 'ON_LEAVE').length;
+
     return {
       admittedTodayCount: DEFAULT_ADMISSIONS.length,
       dischargedTodayCount: DEFAULT_DISCHARGES.length,
       totalBeds: 450,
       occupiedBeds: 394,
-      icuOccupancy: 88.5,
-      doctorsOnDuty: 18,
-      erWaitTimeMinutes: 12
+      icuOccupancyPercent: 88.5,
+      activeSurgeriesCount: 4,
+      totalStaffCount: DEFAULT_STAFF.length,
+      staffOnDutyCount: onDuty,
+      staffOnLeaveCount: onLeave,
+      todayRevenueUsd: 28450,
+      revenueBreakdown: {
+        inpatientWardCharges: 14200,
+        opdConsultations: 3850,
+        surgeriesAndOT: 6200,
+        pharmacyDispensary: 2400,
+        labDiagnostics: 1800
+      },
+      bloodBankOveUnits: 28,
+      oxygenReservesPercent: 96,
+      erWaitTimeMinutes: 11
     };
   }
 };
