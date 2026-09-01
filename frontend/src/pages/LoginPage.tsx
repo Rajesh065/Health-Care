@@ -10,8 +10,15 @@ import {
   UserPlus,
   LogIn,
   CheckCircle2,
-  ShieldAlert
+  ShieldCheck
 } from 'lucide-react';
+
+const getInitials = (name: string) => {
+  const parts = name.replace(/Dr\.|MD|FAAOS|MHA|PhD|BSN|RN|,/g, '').trim().split(' ').filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return 'U';
+};
 
 export const LoginPage: React.FC = () => {
   const { allUsers, switchUserById, registerUser } = useAuth();
@@ -28,7 +35,6 @@ export const LoginPage: React.FC = () => {
   const [phone, setPhone] = useState('+1 (555) 300-8800');
   const [password, setPassword] = useState('password123');
 
-  // Role template defaults helper
   const handlePersonaChange = (newP: UserPersona) => {
     setPersona(newP);
     if (newP === 'EMPLOYEE') {
@@ -95,7 +101,7 @@ export const LoginPage: React.FC = () => {
               }`}
             >
               <LogIn className="w-4 h-4 text-blue-700" />
-              <span>Sign In (Existing Roles & Accounts)</span>
+              <span>Sign In (Existing Accounts)</span>
             </button>
 
             <button
@@ -105,7 +111,7 @@ export const LoginPage: React.FC = () => {
               }`}
             >
               <UserPlus className="w-4 h-4 text-purple-700" />
-              <span>Sign Up (Register New Employee / Doctor / Staff)</span>
+              <span>Sign Up (New Employee / Doctor)</span>
             </button>
           </div>
         </div>
@@ -114,75 +120,76 @@ export const LoginPage: React.FC = () => {
         {authMode === 'LOGIN' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left w-full">
-              {allUsers.map(u => (
-                <div
-                  key={u.id}
-                  className={`bg-white border rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
-                    u.persona === 'MANAGER' ? 'border-blue-200 hover:border-blue-500' :
-                    u.persona === 'EMPLOYEE' ? 'border-purple-200 hover:border-purple-500' :
-                    u.persona === 'RECEPTIONIST' ? 'border-teal-200 hover:border-teal-500' :
-                    'border-emerald-200 hover:border-emerald-500'
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                        u.persona === 'MANAGER' ? 'bg-blue-50 text-blue-800 border-blue-200' :
-                        u.persona === 'EMPLOYEE' ? 'bg-purple-50 text-purple-800 border-purple-200' :
-                        u.persona === 'RECEPTIONIST' ? 'bg-teal-50 text-teal-800 border-teal-200' :
-                        'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      }`}>
-                        {u.persona === 'MANAGER' && <Building2 className="w-5 h-5" />}
-                        {u.persona === 'EMPLOYEE' && <Stethoscope className="w-5 h-5" />}
-                        {u.persona === 'RECEPTIONIST' && <CalendarCheck className="w-5 h-5" />}
-                        {u.persona === 'PATIENT' && <User className="w-5 h-5" />}
-                      </div>
-
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border uppercase ${
-                        u.persona === 'MANAGER' ? 'bg-blue-50 text-blue-900 border-blue-200' :
-                        u.persona === 'EMPLOYEE' ? 'bg-purple-50 text-purple-900 border-purple-200' :
-                        u.persona === 'RECEPTIONIST' ? 'bg-teal-50 text-teal-900 border-teal-200' :
-                        'bg-emerald-50 text-emerald-900 border-emerald-200'
-                      }`}>
-                        {u.persona}
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-base text-slate-900 leading-tight">{u.name}</h3>
-                      <p className="text-xs font-semibold text-slate-600 mt-0.5">{u.role}</p>
-                      {u.employeeId && (
-                        <span className="text-[10px] font-mono text-slate-400 block mt-0.5">
-                          ID: {u.employeeId}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-0.5">
-                      <p className="truncate">Email: {u.email}</p>
-                      <p className="truncate">Dept: {u.department}</p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => switchUserById(u.id)}
-                    className={`mt-4 w-full py-2 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all ${
-                      u.persona === 'MANAGER' ? 'bg-blue-700 hover:bg-blue-800' :
-                      u.persona === 'EMPLOYEE' ? 'bg-purple-700 hover:bg-purple-800' :
-                      u.persona === 'RECEPTIONIST' ? 'bg-teal-700 hover:bg-teal-800' :
-                      'bg-emerald-700 hover:bg-emerald-800'
+              {allUsers.map(u => {
+                const initials = getInitials(u.name);
+                return (
+                  <div
+                    key={u.id}
+                    className={`bg-white border rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
+                      u.persona === 'MANAGER' ? 'border-blue-200 hover:border-blue-500' :
+                      u.persona === 'EMPLOYEE' ? 'border-purple-200 hover:border-purple-500' :
+                      u.persona === 'RECEPTIONIST' ? 'border-teal-200 hover:border-teal-500' :
+                      'border-emerald-200 hover:border-emerald-500'
                     }`}
                   >
-                    <span>Login as {u.name.split(' ')[0]}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        {/* Human Avatar Badge with Initials */}
+                        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-sm text-white shadow-xs font-mono ${
+                          u.persona === 'MANAGER' ? 'bg-blue-800' :
+                          u.persona === 'EMPLOYEE' ? 'bg-purple-800' :
+                          u.persona === 'RECEPTIONIST' ? 'bg-teal-800' :
+                          'bg-emerald-800'
+                        }`}>
+                          {initials}
+                        </div>
+
+                        <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-lg border uppercase ${
+                          u.persona === 'MANAGER' ? 'bg-blue-50 text-blue-900 border-blue-200' :
+                          u.persona === 'EMPLOYEE' ? 'bg-purple-50 text-purple-900 border-purple-200' :
+                          u.persona === 'RECEPTIONIST' ? 'bg-teal-50 text-teal-900 border-teal-200' :
+                          'bg-emerald-50 text-emerald-900 border-emerald-200'
+                        }`}>
+                          {u.persona}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-bold text-base text-slate-900 leading-tight">{u.name}</h3>
+                        <p className="text-xs font-semibold text-slate-600 mt-0.5">{u.role}</p>
+                        {u.employeeId && (
+                          <span className="text-[10px] font-mono text-slate-400 block mt-0.5">
+                            ID: {u.employeeId}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-0.5">
+                        <p className="truncate">Email: {u.email}</p>
+                        <p className="truncate">Dept: {u.department}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => switchUserById(u.id)}
+                      className={`mt-4 w-full py-2.5 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all ${
+                        u.persona === 'MANAGER' ? 'bg-slate-900 hover:bg-slate-800' :
+                        u.persona === 'EMPLOYEE' ? 'bg-purple-700 hover:bg-purple-800' :
+                        u.persona === 'RECEPTIONIST' ? 'bg-teal-700 hover:bg-teal-800' :
+                        'bg-emerald-700 hover:bg-emerald-800'
+                      }`}
+                    >
+                      <span>Login to Portal</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* 2. SIGN UP MODE (NEW EMPLOYEE / DOCTOR REGISTRATION FORM) */}
+        {/* 2. SIGN UP MODE */}
         {authMode === 'SIGNUP' && (
           <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xs max-w-2xl mx-auto text-left space-y-6">
             <div className="border-b border-slate-100 pb-4">
@@ -196,7 +203,7 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSignUpSubmit} className="space-y-4 text-xs">
-              {/* Persona Selector */}
+              {/* Persona Selector with Human-Designed Icons */}
               <div>
                 <label className="font-bold text-slate-800 block mb-1.5">Select Account Role *</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-semibold">
