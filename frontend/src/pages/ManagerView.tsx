@@ -12,29 +12,9 @@ import {
   SupplyItem
 } from '../types';
 import {
-  Building2,
-  Bed,
-  Scissors,
-  Users,
-  CalendarCheck2,
-  Package,
-  Activity,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
-  ShieldCheck,
-  Ambulance,
-  Wind,
-  Droplet,
-  Layers,
-  Wrench,
-  XCircle,
   X,
-  DollarSign,
-  Filter,
-  PlayCircle,
-  Calendar,
-  AlertCircle
+  AlertTriangle,
+  PlayCircle
 } from 'lucide-react';
 
 export const ManagerView: React.FC = () => {
@@ -115,35 +95,35 @@ export const ManagerView: React.FC = () => {
   const depletedBloods = bloodStock.filter(b => b.status === 'Critical Shortage' || b.status === 'Depleted / Empty');
 
   return (
-    <div className="space-y-6 font-sans w-full">
+    <div className="space-y-6 font-sans w-full max-w-7xl mx-auto">
       {/* Manager Header Overview */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Marcus Sterling, MHA — Hospital Operations & Facility Manager</h1>
-            <span className="text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200 px-2.5 py-0.5 rounded font-mono">
-              HOSPITAL COMMAND CENTER
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Hospital Operations Command</h1>
+            <span className="text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200 px-2.5 py-0.5 rounded-md font-mono">
+              MANAGER: MARCUS STERLING, MHA
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Real-Time Floor Beds (Filled vs Kaliga), Live OT Surgeries, Ambulance Monthly Running Cost, and Blood Bank Inventory
+          <p className="text-xs text-slate-500 mt-1">
+            Real-time facility telemetry, floor & room bed occupancy, active OT suites, ambulance logistics, and blood bank reserves
           </p>
         </div>
 
         <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-right">
-            <span className="text-[10px] text-rose-800 font-semibold block">LIVE OT SURGERIES RUNNING</span>
-            <span className="text-base font-black text-rose-950 animate-pulse">● {runningOps.length} Active in OT Suites</span>
+          <div className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl text-right">
+            <span className="text-[10px] text-rose-800 font-bold block uppercase tracking-wider">Live Surgeries Active</span>
+            <span className="text-sm font-black text-rose-950">{runningOps.length} OT Suites in Progress</span>
           </div>
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs for Manager */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-slate-200/70 rounded-xl text-xs font-semibold w-full">
+      {/* Human Navigation Tab Bar (Clean Typography-First, No Icon Clutter) */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-200/60 rounded-xl text-xs font-semibold w-full">
         <button
           onClick={() => setActiveTab('OVERVIEW')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
-            activeTab === 'OVERVIEW' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'OVERVIEW' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           Operations Overview
@@ -152,168 +132,178 @@ export const ManagerView: React.FC = () => {
         <button
           onClick={() => setActiveTab('BEDS')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'BEDS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'BEDS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Bed className="w-3.5 h-3.5 text-amber-700" />
-          <span>Floor & Room Beds ({availableCount} Kaliga / Free)</span>
+          <span>Floor & Room Beds</span>
+          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded">
+            {availableCount} Free
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('OPERATIONS')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'OPERATIONS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'OPERATIONS' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Scissors className="w-3.5 h-3.5 text-rose-700" />
-          <span>Live Operations (🔴 {runningOps.length} Running | 🟡 {upcomingOps.length} Upcoming)</span>
+          <span>Live Operations</span>
+          <span className="text-[10px] font-mono font-bold bg-rose-100 text-rose-900 px-1.5 py-0.2 rounded">
+            {runningOps.length} Running
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('AMBULANCES')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'AMBULANCES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'AMBULANCES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Ambulance className="w-3.5 h-3.5 text-blue-700" />
-          <span>Ambulances ({ambulances.length} Fleet & Monthly Cost)</span>
+          <span>Ambulances & Fleet</span>
+          <span className="text-[10px] font-mono font-bold bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded">
+            {ambulances.length} Units
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('BLOOD')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'BLOOD' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'BLOOD' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Droplet className="w-3.5 h-3.5 text-rose-700" />
-          <span>Blood Bank ({depletedBloods.length} Urgent Depleted)</span>
+          <span>Blood Bank</span>
+          <span className="text-[10px] font-mono font-bold bg-rose-100 text-rose-900 px-1.5 py-0.2 rounded">
+            {depletedBloods.length} Depleted
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('LEAVES')}
           className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'LEAVES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-700 hover:text-slate-900'
+            activeTab === 'LEAVES' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <CalendarCheck2 className="w-3.5 h-3.5 text-purple-700" />
-          <span>Staff Leaves ({leaveRecords.filter(l => l.approvalStatus === 'Pending Review').length} Pending)</span>
+          <span>Staff Leaves</span>
+          <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded">
+            {leaveRecords.filter(l => l.approvalStatus === 'Pending Review').length} Pending
+          </span>
         </button>
       </div>
 
-      {/* Top 4 Real-Time KPI Metric Cards */}
+      {/* Top 4 Handcrafted Metric Cards (Clean, Professional Human Design) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-xs w-full">
         {/* 1. Bed Grid Status */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-amber-400" onClick={() => setActiveTab('BEDS')}>
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Room & Bed Availability</span>
-            <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
-              <Bed className="w-4 h-4" />
-            </div>
+        <div
+          className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-slate-400 transition-all"
+          onClick={() => setActiveTab('BEDS')}
+        >
+          <div className="flex justify-between items-center text-slate-500 font-semibold">
+            <span>Room & Bed Availability</span>
+            <span className="text-[10px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-bold">
+              OPEN
+            </span>
           </div>
-          <div className="text-2xl font-black text-slate-900">{availableCount} Beds Kaliga (Free)</div>
-          <p className="text-[11px] text-slate-600 font-medium">{occupiedCount} Filled / Occupied Rooms Across All Floors</p>
+          <div className="text-2xl font-black text-slate-900">{availableCount} Beds Free</div>
+          <p className="text-[11px] text-slate-500">{occupiedCount} Filled across 8 hospital wards</p>
         </div>
 
         {/* 2. Operations Running / Upcoming */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-rose-400" onClick={() => setActiveTab('OPERATIONS')}>
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Live OT Surgeries Tracker</span>
-            <div className="p-2 bg-rose-50 text-rose-700 rounded-xl">
-              <Scissors className="w-4 h-4" />
-            </div>
+        <div
+          className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-slate-400 transition-all"
+          onClick={() => setActiveTab('OPERATIONS')}
+        >
+          <div className="flex justify-between items-center text-slate-500 font-semibold">
+            <span>Live OT Surgeries</span>
+            <span className="text-[10px] font-mono bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded font-bold">
+              IN OT
+            </span>
           </div>
-          <div className="text-2xl font-black text-rose-950">🔴 {runningOps.length} Running Now</div>
-          <p className="text-[11px] text-amber-800 font-semibold">🟡 {upcomingOps.length} Upcoming • 🟢 {completedOps.length} Done Today</p>
+          <div className="text-2xl font-black text-rose-950">{runningOps.length} Running Now</div>
+          <p className="text-[11px] text-slate-500">{upcomingOps.length} upcoming today • {completedOps.length} completed</p>
         </div>
 
         {/* 3. Ambulance Fleet & Monthly Cost */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-blue-400" onClick={() => setActiveTab('AMBULANCES')}>
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Ambulances & Monthly Cost</span>
-            <div className="p-2 bg-blue-50 text-blue-700 rounded-xl">
-              <Ambulance className="w-4 h-4" />
-            </div>
+        <div
+          className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-slate-400 transition-all"
+          onClick={() => setActiveTab('AMBULANCES')}
+        >
+          <div className="flex justify-between items-center text-slate-500 font-semibold">
+            <span>Ambulance Monthly Cost</span>
+            <span className="text-[10px] font-mono bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded font-bold">
+              FLEET
+            </span>
           </div>
-          <div className="text-2xl font-black text-blue-950">${stats.totalAmbulanceMonthlyCostUSD.toLocaleString()} / mo</div>
-          <p className="text-[11px] text-blue-700 font-medium">₹{(stats.totalAmbulanceMonthlyCostINR / 100000).toFixed(2)} Lakhs/mo • 5 Vehicles Active</p>
+          <div className="text-2xl font-black text-slate-900">${stats.totalAmbulanceMonthlyCostUSD.toLocaleString()} / mo</div>
+          <p className="text-[11px] text-slate-500">₹{(stats.totalAmbulanceMonthlyCostINR / 100000).toFixed(2)} Lakhs/mo • 5 active vehicles</p>
         </div>
 
         {/* 4. Blood Bank Depleted Alert */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-rose-400" onClick={() => setActiveTab('BLOOD')}>
-          <div className="flex justify-between items-center text-slate-500">
-            <span className="font-semibold">Blood Bank & Depletion Alert</span>
-            <div className="p-2 bg-rose-50 text-rose-700 rounded-xl">
-              <Droplet className="w-4 h-4" />
-            </div>
+        <div
+          className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-1.5 cursor-pointer hover:border-slate-400 transition-all"
+          onClick={() => setActiveTab('BLOOD')}
+        >
+          <div className="flex justify-between items-center text-slate-500 font-semibold">
+            <span>Blood Bank Reserves</span>
+            <span className="text-[10px] font-mono bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded font-bold">
+              URGENT
+            </span>
           </div>
           <div className="text-2xl font-black text-rose-950">{depletedBloods.length} Groups Depleted</div>
-          <p className="text-[11px] text-rose-700 font-bold">O-ve (2 units left) & AB-ve (Empty)</p>
+          <p className="text-[11px] text-slate-500">O-ve (2 units left) & AB-ve (empty)</p>
         </div>
       </div>
 
       {/* TAB 1: OPERATIONS OVERVIEW */}
       {activeTab === 'OVERVIEW' && (
         <div className="space-y-6">
-          {/* Quick Shortcuts to 4 Requested Modules */}
+          {/* 4 Clean Navigation Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
             {/* 1. Bed Grid Shortcut */}
             <div
               onClick={() => setActiveTab('BEDS')}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-amber-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer space-y-2"
             >
-              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
-                <Bed className="w-4 h-4 text-amber-700" />
-                <span>Floor & Room Beds</span>
-              </div>
-              <p className="text-slate-500 text-[11px]">
+              <span className="font-bold text-slate-900 text-sm block">Floor & Room Beds</span>
+              <p className="text-slate-500 text-[11px] leading-relaxed">
                 Detailed floor matrix showing exact room numbers, occupied beds with patient names, and available free beds.
               </p>
-              <span className="text-amber-800 font-bold block pt-1 text-[11px]">Open Bed Layout →</span>
+              <span className="text-slate-900 font-bold block pt-1 text-[11px]">Open Bed Layout →</span>
             </div>
 
             {/* 2. Operations Shortcut */}
             <div
               onClick={() => setActiveTab('OPERATIONS')}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-rose-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer space-y-2"
             >
-              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
-                <Scissors className="w-4 h-4 text-rose-700" />
-                <span>Live OT Surgeries</span>
-              </div>
-              <p className="text-slate-500 text-[11px]">
+              <span className="font-bold text-slate-900 text-sm block">Live OT Surgeries</span>
+              <p className="text-slate-500 text-[11px] leading-relaxed">
                 Real-time tracking of surgeries running right now in OT suites, upcoming afternoon cases, and completed surgeries.
               </p>
-              <span className="text-rose-800 font-bold block pt-1 text-[11px]">View OT Suites Status →</span>
+              <span className="text-slate-900 font-bold block pt-1 text-[11px]">View OT Suites Status →</span>
             </div>
 
             {/* 3. Ambulance Cost Shortcut */}
             <div
               onClick={() => setActiveTab('AMBULANCES')}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-blue-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer space-y-2"
             >
-              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
-                <Ambulance className="w-4 h-4 text-blue-700" />
-                <span>Ambulances & Monthly Cost</span>
-              </div>
-              <p className="text-slate-500 text-[11px]">
+              <span className="font-bold text-slate-900 text-sm block">Ambulances & Monthly Cost</span>
+              <p className="text-slate-500 text-[11px] leading-relaxed">
                 5 Active ambulance fleet with breakdown of fuel, driver salaries, life support maintenance, and total monthly cost.
               </p>
-              <span className="text-blue-800 font-bold block pt-1 text-[11px]">View Cost Breakdown →</span>
+              <span className="text-slate-900 font-bold block pt-1 text-[11px]">View Cost Breakdown →</span>
             </div>
 
             {/* 4. Blood Bank Shortcut */}
             <div
               onClick={() => setActiveTab('BLOOD')}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-rose-400 hover:shadow-md transition-all cursor-pointer space-y-2"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer space-y-2"
             >
-              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
-                <Droplet className="w-4 h-4 text-rose-700" />
-                <span>Blood Bank & Urgent Demand</span>
-              </div>
-              <p className="text-slate-500 text-[11px]">
+              <span className="font-bold text-slate-900 text-sm block">Blood Bank & Urgent Demand</span>
+              <p className="text-slate-500 text-[11px] leading-relaxed">
                 Stock levels for all 8 blood groups, depleted groups alert, and next urgent blood units needed for surgeries.
               </p>
-              <span className="text-rose-800 font-bold block pt-1 text-[11px]">View Blood Matrix →</span>
+              <span className="text-slate-900 font-bold block pt-1 text-[11px]">View Blood Matrix →</span>
             </div>
           </div>
 
@@ -322,27 +312,24 @@ export const ManagerView: React.FC = () => {
             {/* Live Surgeries Mini-Board */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <Scissors className="w-4 h-4 text-rose-700" />
-                  <h4 className="font-bold text-sm text-slate-900">Live Surgeries in OT Suites (Running Now)</h4>
-                </div>
-                <button onClick={() => setActiveTab('OPERATIONS')} className="text-xs font-bold text-rose-700 hover:underline cursor-pointer">
+                <h4 className="font-bold text-sm text-slate-900">Live Surgeries in OT Suites (Running Now)</h4>
+                <button onClick={() => setActiveTab('OPERATIONS')} className="text-xs font-bold text-slate-700 hover:underline cursor-pointer">
                   All OT Cases →
                 </button>
               </div>
 
               <div className="space-y-2.5">
                 {runningOps.map(op => (
-                  <div key={op.id} className="p-4 bg-rose-50/50 border border-rose-200 rounded-xl space-y-1.5 text-xs">
+                  <div key={op.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="font-mono font-bold text-[10px] text-rose-800 bg-rose-100 px-2 py-0.5 rounded">
+                        <span className="font-mono font-bold text-[10px] text-slate-600 bg-slate-200 px-2 py-0.5 rounded">
                           {op.otSuite}
                         </span>
                         <h5 className="font-bold text-slate-900 text-sm mt-1">{op.procedureName}</h5>
                       </div>
-                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-rose-600 text-white font-mono animate-pulse">
-                        🔴 IN PROGRESS ({op.elapsedMinutes} mins elapsed)
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-rose-700 text-white font-mono">
+                        IN PROGRESS ({op.elapsedMinutes}m elapsed)
                       </span>
                     </div>
                     <p className="text-slate-600 text-[11px]">
@@ -356,11 +343,8 @@ export const ManagerView: React.FC = () => {
             {/* Pending Employee Leave Requests */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck2 className="w-4 h-4 text-purple-700" />
-                  <h4 className="font-bold text-sm text-slate-900">Employee Leave Requests Pending Decision</h4>
-                </div>
-                <button onClick={() => setActiveTab('LEAVES')} className="text-xs font-bold text-purple-700 hover:underline cursor-pointer">
+                <h4 className="font-bold text-sm text-slate-900">Employee Leave Requests Pending Decision</h4>
+                <button onClick={() => setActiveTab('LEAVES')} className="text-xs font-bold text-slate-700 hover:underline cursor-pointer">
                   Manage All Leaves →
                 </button>
               </div>
@@ -406,7 +390,7 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: FLOOR & ROOM BEDS LAYOUT (FILLED VS KALIGA / AVAILABLE) */}
+      {/* TAB 2: FLOOR & ROOM BEDS LAYOUT */}
       {activeTab === 'BEDS' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
@@ -419,17 +403,16 @@ export const ManagerView: React.FC = () => {
 
             <div className="flex items-center gap-2 font-mono text-xs">
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold">
-                🟢 {availableCount} Beds Kaliga (Free)
+                {availableCount} Beds Kaliga (Free)
               </span>
               <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold">
-                🔴 {occupiedCount} Beds Filled
+                {occupiedCount} Beds Filled
               </span>
             </div>
           </div>
 
           {/* Filter Controls: Floors & Availability */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-            {/* Floor Tabs */}
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="font-bold text-slate-600 mr-1">Select Floor:</span>
               {['ALL', 'Ground Floor', 'Floor 1', 'Floor 2', 'Floor 3', 'Floor 4'].map(fl => (
@@ -445,7 +428,6 @@ export const ManagerView: React.FC = () => {
               ))}
             </div>
 
-            {/* Availability Filter */}
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-slate-600 mr-1">Status:</span>
               <select
@@ -454,8 +436,8 @@ export const ManagerView: React.FC = () => {
                 className="p-1.5 bg-white border border-slate-200 rounded-lg font-medium outline-none"
               >
                 <option value="ALL">Show All Beds (Filled + Kaliga)</option>
-                <option value="AVAILABLE_ONLY">🟢 Kaliga / Free Beds Only</option>
-                <option value="OCCUPIED_ONLY">🔴 Filled / Occupied Beds Only</option>
+                <option value="AVAILABLE_ONLY">Kaliga / Free Beds Only</option>
+                <option value="OCCUPIED_ONLY">Filled / Occupied Beds Only</option>
               </select>
             </div>
           </div>
@@ -468,7 +450,7 @@ export const ManagerView: React.FC = () => {
                 className={`p-5 rounded-2xl border space-y-3 flex flex-col justify-between transition-all ${
                   bed.isOccupied
                     ? 'bg-slate-50/70 border-slate-300'
-                    : 'bg-emerald-50/30 border-emerald-200 shadow-xs hover:border-emerald-500'
+                    : 'bg-emerald-50/20 border-emerald-200 shadow-xs'
                 }`}
               >
                 <div className="space-y-2">
@@ -483,18 +465,18 @@ export const ManagerView: React.FC = () => {
                         ? 'bg-rose-100 text-rose-900 border border-rose-300'
                         : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                     }`}>
-                      {bed.isOccupied ? '🔴 FILLED / OCCUPIED' : '🟢 KALIGA / AVAILABLE'}
+                      {bed.isOccupied ? 'FILLED / OCCUPIED' : 'KALIGA / AVAILABLE'}
                     </span>
                   </div>
 
                   <div className="p-2.5 bg-white rounded-xl border border-slate-200/80 text-[11px] space-y-1">
-                    <span className="text-[10px] font-mono font-bold text-slate-400 block uppercase">Bed Specification</span>
+                    <span className="text-[10px] font-mono font-bold text-slate-400 block uppercase">Bed Type</span>
                     <p className="font-bold text-slate-800">{bed.bedType}</p>
                   </div>
 
                   {/* Patient Details if Occupied */}
                   {bed.isOccupied ? (
-                    <div className="p-3 bg-white rounded-xl border border-rose-100 space-y-1 text-[11px] text-slate-700">
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1 text-[11px] text-slate-700">
                       <div className="flex justify-between items-center font-bold text-slate-900">
                         <span>Patient: {bed.patientName}</span>
                         <span className="font-mono text-[10px] text-slate-500">{bed.patientAge}y, {bed.patientGender}</span>
@@ -505,7 +487,7 @@ export const ManagerView: React.FC = () => {
                     </div>
                   ) : (
                     <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-[11px] text-emerald-950 space-y-0.5">
-                      <span className="font-bold block">✓ Ready for Immediate Admission</span>
+                      <span className="font-bold block">Ready for Immediate Admission</span>
                       <p className="text-emerald-800">Sterilized, sanitized, linen changed, monitor linked.</p>
                     </div>
                   )}
@@ -523,7 +505,7 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: LIVE OPERATIONS (RUNNING NOW, UPCOMING TODAY, COMPLETED) */}
+      {/* TAB 3: LIVE OPERATIONS */}
       {activeTab === 'OPERATIONS' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-4">
@@ -536,33 +518,30 @@ export const ManagerView: React.FC = () => {
 
             <div className="flex items-center gap-2 text-xs font-mono">
               <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold">
-                🔴 {runningOps.length} Running
+                {runningOps.length} Running
               </span>
               <span className="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-xl font-bold">
-                🟡 {upcomingOps.length} Upcoming
+                {upcomingOps.length} Upcoming
               </span>
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold">
-                🟢 {completedOps.length} Completed
+                {completedOps.length} Completed
               </span>
             </div>
           </div>
 
-          {/* 1. RUNNING NOW (LIVE IN OT) */}
+          {/* 1. RUNNING NOW */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-rose-800">
-              <PlayCircle className="w-4 h-4 text-rose-600 animate-pulse" />
-              <span>🔴 Surgeries Running Right Now in OT Suites ({runningOps.length})</span>
-            </div>
+            <h4 className="font-bold text-sm text-slate-900">Surgeries Running Right Now in OT Suites ({runningOps.length})</h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {runningOps.map(op => (
-                <div key={op.id} className="p-5 bg-rose-50/40 border-2 border-rose-300 rounded-2xl space-y-3 shadow-xs">
+                <div key={op.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 shadow-xs">
                   <div className="flex justify-between items-start">
-                    <span className="font-mono font-bold text-[10px] text-rose-900 bg-rose-100 px-2.5 py-0.5 rounded border border-rose-300">
+                    <span className="font-mono font-bold text-[10px] text-slate-800 bg-slate-200 px-2.5 py-0.5 rounded">
                       {op.otSuite}
                     </span>
-                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-rose-600 text-white font-mono animate-pulse">
-                      ● RUNNING ({op.elapsedMinutes}m / {op.durationMinutes}m)
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-rose-700 text-white font-mono">
+                      RUNNING ({op.elapsedMinutes}m / {op.durationMinutes}m)
                     </span>
                   </div>
 
@@ -571,14 +550,14 @@ export const ManagerView: React.FC = () => {
                     <p className="text-slate-600 text-[11px] mt-0.5">
                       Patient: <strong>{op.patientName}</strong> ({op.patientAge} years old)
                     </p>
-                    <p className="text-rose-950 font-semibold text-[11px]">
+                    <p className="text-slate-800 font-semibold text-[11px]">
                       Lead Surgeon: <strong>{op.primarySurgeon}</strong>
                     </p>
                     <p className="text-slate-500 text-[10px]">Assisting Team: {op.assistingTeam}</p>
                   </div>
 
-                  <div className="p-3 bg-white rounded-xl border border-rose-200 text-[11px] text-slate-800">
-                    <span className="font-bold block text-rose-900">Live Clinical Progress:</span>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-[11px] text-slate-800">
+                    <span className="font-bold block text-slate-900">Live Clinical Progress:</span>
                     <p>{op.clinicalNotes}</p>
                   </div>
                 </div>
@@ -586,22 +565,19 @@ export const ManagerView: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. UPCOMING SCHEDULED TODAY */}
+          {/* 2. UPCOMING TODAY */}
           <div className="space-y-3 pt-4 border-t border-slate-100">
-            <div className="flex items-center gap-2 text-sm font-bold text-amber-800">
-              <Clock className="w-4 h-4 text-amber-600" />
-              <span>🟡 Upcoming Scheduled Surgeries Today ({upcomingOps.length})</span>
-            </div>
+            <h4 className="font-bold text-sm text-slate-900">Upcoming Scheduled Surgeries Today ({upcomingOps.length})</h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {upcomingOps.map(op => (
-                <div key={op.id} className="p-5 bg-amber-50/30 border border-amber-200 rounded-2xl space-y-3">
+                <div key={op.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                   <div className="flex justify-between items-start">
-                    <span className="font-mono font-bold text-[10px] text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-300">
+                    <span className="font-mono font-bold text-[10px] text-slate-800 bg-slate-200 px-2.5 py-0.5 rounded">
                       {op.otSuite} • {op.scheduledTime}
                     </span>
                     <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 font-mono">
-                      🟡 UPCOMING
+                      UPCOMING
                     </span>
                   </div>
 
@@ -616,8 +592,8 @@ export const ManagerView: React.FC = () => {
                     <p className="text-slate-500 text-[10px]">Team: {op.assistingTeam}</p>
                   </div>
 
-                  <div className="p-3 bg-white rounded-xl border border-amber-200 text-[11px] text-slate-700">
-                    <span className="font-bold block text-amber-900">Pre-Op Preparation:</span>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200 text-[11px] text-slate-700">
+                    <span className="font-bold block text-slate-900">Pre-Op Preparation:</span>
                     <p>{op.clinicalNotes}</p>
                   </div>
                 </div>
@@ -627,20 +603,17 @@ export const ManagerView: React.FC = () => {
 
           {/* 3. COMPLETED TODAY */}
           <div className="space-y-3 pt-4 border-t border-slate-100">
-            <div className="flex items-center gap-2 text-sm font-bold text-emerald-800">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>🟢 Completed Surgeries Shifted to Recovery ({completedOps.length})</span>
-            </div>
+            <h4 className="font-bold text-sm text-slate-900">Completed Surgeries Shifted to Recovery ({completedOps.length})</h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {completedOps.map(op => (
-                <div key={op.id} className="p-5 bg-emerald-50/30 border border-emerald-200 rounded-2xl space-y-2.5">
+                <div key={op.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
                   <div className="flex justify-between items-start">
-                    <span className="font-mono font-bold text-[10px] text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-300">
+                    <span className="font-mono font-bold text-[10px] text-slate-800 bg-slate-200 px-2.5 py-0.5 rounded">
                       {op.otSuite} • {op.scheduledTime}
                     </span>
                     <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300 font-mono">
-                      ✓ COMPLETED
+                      COMPLETED
                     </span>
                   </div>
 
@@ -651,7 +624,7 @@ export const ManagerView: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white rounded-xl border border-emerald-200 text-[11px] text-slate-700">
+                  <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-[11px] text-slate-700">
                     <p>{op.clinicalNotes}</p>
                   </div>
                 </div>
@@ -661,7 +634,7 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 4: AMBULANCE FLEET & MONTHLY COST (YENNI WORK AVUTUNAYE & MONTH COST) */}
+      {/* TAB 4: AMBULANCE FLEET & MONTHLY COST */}
       {activeTab === 'AMBULANCES' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
@@ -672,9 +645,9 @@ export const ManagerView: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-right font-mono">
-              <span className="text-[10px] text-blue-800 font-bold block">TOTAL FLEET MONTHLY COST</span>
-              <span className="text-lg font-black text-blue-950">
+            <div className="p-3 bg-slate-100 border border-slate-200 rounded-xl text-right font-mono">
+              <span className="text-[10px] text-slate-600 font-bold block uppercase">Total Fleet Monthly Cost</span>
+              <span className="text-lg font-black text-slate-900">
                 ${stats.totalAmbulanceMonthlyCostUSD.toLocaleString()} / Month (₹{(stats.totalAmbulanceMonthlyCostINR / 100000).toFixed(2)} Lakhs)
               </span>
             </div>
@@ -685,24 +658,24 @@ export const ManagerView: React.FC = () => {
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
               <span className="text-slate-500 font-semibold block">Total Active Ambulances</span>
               <div className="text-2xl font-black text-slate-900">{ambulances.length} Emergency Units</div>
-              <span className="text-[10px] text-emerald-700 font-bold">3 Standby • 1 In Transit • 1 Workshop</span>
+              <span className="text-[10px] text-slate-600 font-bold">3 Standby • 1 In Transit • 1 Workshop</span>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
               <span className="text-slate-500 font-semibold block">Monthly Fuel & Diesel Cost</span>
-              <div className="text-2xl font-black text-blue-900">$2,700 / mo</div>
+              <div className="text-2xl font-black text-slate-900">$2,700 / mo</div>
               <span className="text-[10px] text-slate-500 font-mono">₹2.21 Lakhs (24/7 Engine Readiness)</span>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
               <span className="text-slate-500 font-semibold block">EMT Driver & Paramedic Salaries</span>
-              <div className="text-2xl font-black text-purple-900">$6,300 / mo</div>
+              <div className="text-2xl font-black text-slate-900">$6,300 / mo</div>
               <span className="text-[10px] text-slate-500 font-mono">₹5.16 Lakhs (10 Shift Staff)</span>
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-              <span className="text-slate-500 font-semibold block">Life Support & Vehicle Maintenance</span>
-              <div className="text-2xl font-black text-teal-900">$2,500 / mo</div>
+              <span className="text-slate-500 font-semibold block">Life Support & Maintenance</span>
+              <div className="text-2xl font-black text-slate-900">$2,500 / mo</div>
               <span className="text-[10px] text-slate-500 font-mono">₹2.05 Lakhs (Defibrillator & O2 Cert)</span>
             </div>
           </div>
@@ -723,10 +696,10 @@ export const ManagerView: React.FC = () => {
 
                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
                         amb.status === 'Standby' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                        amb.status === 'In Transit (Emergency)' ? 'bg-rose-100 text-rose-900 border border-rose-300 animate-pulse' :
+                        amb.status === 'In Transit (Emergency)' ? 'bg-rose-100 text-rose-900 border border-rose-300' :
                         'bg-amber-100 text-amber-900 border border-amber-300'
                       }`}>
-                        ● {amb.status}
+                        {amb.status}
                       </span>
                     </div>
 
@@ -737,14 +710,14 @@ export const ManagerView: React.FC = () => {
                     </div>
 
                     {/* Cost Breakdown */}
-                    <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200 text-[11px] space-y-1">
-                      <span className="font-bold text-blue-950 block">Monthly Operating Cost:</span>
+                    <div className="p-3 bg-slate-100/70 rounded-xl border border-slate-200 text-[11px] space-y-1">
+                      <span className="font-bold text-slate-900 block">Monthly Operating Cost:</span>
                       <div className="flex justify-between text-slate-600">
                         <span>Fuel Expense: ${amb.fuelExpense}</span>
                         <span>Staff Salary: ${amb.staffSalary}</span>
                         <span>Maintenance: ${amb.maintenanceExpense}</span>
                       </div>
-                      <div className="flex justify-between font-bold text-blue-900 pt-1 border-t border-blue-200 text-xs font-mono">
+                      <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200 text-xs font-mono">
                         <span>Total Monthly:</span>
                         <span>${amb.monthlyCostUSD.toLocaleString()} / mo (₹{amb.monthlyCostINR.toLocaleString()})</span>
                       </div>
@@ -757,7 +730,7 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 5: BLOOD BANK MATRIX (AVAILABLE, DEPLETED, AND NEXT NEEDED) */}
+      {/* TAB 5: BLOOD BANK MATRIX */}
       {activeTab === 'BLOOD' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 w-full">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
@@ -770,10 +743,9 @@ export const ManagerView: React.FC = () => {
 
             <button
               onClick={() => alert('Emergency Blood Request broadcasted to Red Cross Regional Blood Bank and Volunteer Donor Network!')}
-              className="px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
             >
-              <Droplet className="w-3.5 h-3.5" />
-              <span>Broadcast Emergency Blood Drive</span>
+              Broadcast Emergency Blood Drive
             </button>
           </div>
 
@@ -784,20 +756,20 @@ export const ManagerView: React.FC = () => {
                 key={b.group}
                 className={`p-5 rounded-2xl border space-y-3 flex flex-col justify-between ${
                   b.status === 'Optimal' ? 'bg-slate-50 border-slate-200' :
-                  b.status === 'Adequate' ? 'bg-blue-50/40 border-blue-200' :
-                  'bg-rose-50/50 border-2 border-rose-400 shadow-xs'
+                  b.status === 'Adequate' ? 'bg-slate-50 border-slate-200' :
+                  'bg-rose-50/40 border border-rose-300'
                 }`}
               >
                 <div className="space-y-2">
                   <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center font-black text-xl text-rose-700 shadow-xs font-mono">
+                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-300 flex items-center justify-center font-black text-xl text-slate-900 shadow-xs font-mono">
                       {b.group}
                     </div>
 
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
                       b.status === 'Optimal' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                      b.status === 'Adequate' ? 'bg-blue-100 text-blue-900 border border-blue-300' :
-                      'bg-rose-600 text-white animate-pulse'
+                      b.status === 'Adequate' ? 'bg-slate-200 text-slate-800' :
+                      'bg-rose-100 text-rose-900 border border-rose-300'
                     }`}>
                       {b.status}
                     </span>
@@ -812,16 +784,16 @@ export const ManagerView: React.FC = () => {
                   {/* Urgent Demand & Reason if Depleted */}
                   {b.urgentUnitsNeeded > 0 && (
                     <div className="p-3 bg-white rounded-xl border border-rose-200 text-[11px] space-y-1 text-rose-950 font-medium">
-                      <span className="font-bold text-rose-700 block">Next Urgent Demand Needed:</span>
-                      <p className="font-black text-sm text-rose-700 font-mono">+{b.urgentUnitsNeeded} Units Required Immediately</p>
-                      <p className="text-[10px] leading-relaxed text-slate-700 pt-1 border-t border-rose-100">{b.urgentReason}</p>
+                      <span className="font-bold text-rose-800 block">Next Urgent Demand Needed:</span>
+                      <p className="font-black text-sm text-rose-800 font-mono">+{b.urgentUnitsNeeded} Units Required Immediately</p>
+                      <p className="text-[10px] leading-relaxed text-slate-600 pt-1 border-t border-rose-100">{b.urgentReason}</p>
                     </div>
                   )}
                 </div>
 
                 <div className="pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-400 flex justify-between">
                   <span>Group: {b.group}</span>
-                  <span className={b.unitsAvailable < 5 ? 'text-rose-700 font-bold' : 'text-emerald-700 font-bold'}>
+                  <span className={b.unitsAvailable < 5 ? 'text-rose-700 font-bold' : 'text-slate-600 font-bold'}>
                     {b.unitsAvailable < 5 ? 'Restock Immediately' : 'Stock Stable'}
                   </span>
                 </div>
@@ -831,7 +803,7 @@ export const ManagerView: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 6: EMPLOYEE LEAVES MANAGEMENT (ACCEPT OR REJECT) */}
+      {/* TAB 6: EMPLOYEE LEAVES MANAGEMENT */}
       {activeTab === 'LEAVES' && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 w-full">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -839,7 +811,7 @@ export const ManagerView: React.FC = () => {
               <h3 className="font-bold text-base text-slate-900">Hospital Staff Leave Management & Approvals/Rejections</h3>
               <p className="text-xs text-slate-500">Accept or reject leave applications submitted by doctors, surgeons, nurses, and biomedical staff</p>
             </div>
-            <span className="text-xs font-mono font-bold bg-purple-50 text-purple-900 border border-purple-200 px-3 py-1 rounded-xl">
+            <span className="text-xs font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 rounded-xl">
               142 Total Employees
             </span>
           </div>
@@ -851,7 +823,7 @@ export const ManagerView: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-slate-900">{lv.employeeName}</span>
                     <span className="text-[10px] font-mono bg-slate-200 text-slate-800 px-2 py-0.5 rounded font-semibold">{lv.role}</span>
-                    <span className="text-[10px] font-mono bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-semibold">{lv.department}</span>
+                    <span className="text-[10px] font-mono bg-slate-200 text-slate-800 px-2 py-0.5 rounded font-semibold">{lv.department}</span>
                   </div>
                   <p className="text-[11px] text-slate-600">
                     <strong>Leave Type:</strong> {lv.leaveType} Leave • <strong>Duration:</strong> {lv.startDate} to {lv.endDate} (Applied: {lv.appliedDate})
@@ -859,8 +831,8 @@ export const ManagerView: React.FC = () => {
                   <p className="text-[11px] text-slate-500">
                     <strong>Reason:</strong> {lv.reason}
                   </p>
-                  <p className="text-[11px] text-emerald-800 font-bold">
-                    ✓ Verified Substitute Cover: {lv.substituteCover}
+                  <p className="text-[11px] text-slate-800 font-semibold">
+                    Verified Substitute Cover: {lv.substituteCover}
                   </p>
                   {lv.managerNote && (
                     <p className="text-[11px] text-slate-700 italic">
@@ -874,25 +846,23 @@ export const ManagerView: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleApproveLeave(lv.id)}
-                        className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                        className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-all cursor-pointer"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Accept Leave</span>
+                        Accept Leave
                       </button>
 
                       <button
                         onClick={() => setRejectingLeave(lv)}
-                        className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                        className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer"
                       >
-                        <XCircle className="w-3.5 h-3.5" />
-                        <span>Reject Leave</span>
+                        Reject Leave
                       </button>
                     </div>
                   ) : (
                     <span className={`text-[11px] font-mono font-bold px-3 py-1.5 rounded-xl ${
                       lv.approvalStatus === 'Approved' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
                     }`}>
-                      ● {lv.approvalStatus === 'Approved' ? '✓ Accepted by Manager' : '✗ Rejected by Manager'}
+                      {lv.approvalStatus === 'Approved' ? 'Accepted by Manager' : 'Rejected by Manager'}
                     </span>
                   )}
                 </div>
