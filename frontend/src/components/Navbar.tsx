@@ -9,9 +9,7 @@ import {
   LogOut,
   Stethoscope,
   ShieldCheck,
-  CalendarCheck,
-  Bed,
-  FileText
+  CalendarCheck
 } from 'lucide-react';
 
 export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) => {
@@ -60,17 +58,19 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
           )}
         </div>
 
-        {/* Right Actions: Book Button & User Profile */}
+        {/* Right Actions: '+ Book Appointment' ONLY FOR PATIENTS, plus Profile Dropdown */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={onBookClick}
-            className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>{persona === 'PATIENT' ? 'Book Appointment' : 'New Appointment'}</span>
-          </button>
+          {persona === 'PATIENT' && (
+            <button
+              onClick={onBookClick}
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Book Appointment</span>
+            </button>
+          )}
 
-          <div className="h-5 w-px bg-slate-200"></div>
+          {persona === 'PATIENT' && <div className="h-5 w-px bg-slate-200"></div>}
 
           {/* Profile & Role Switcher */}
           <div className="relative">
