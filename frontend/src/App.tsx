@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { BookAppointmentModal } from './components/BookAppointmentModal';
 import { LoginPage } from './pages/LoginPage';
 import { ManagerView } from './pages/ManagerView';
+import { EmployeeView } from './pages/EmployeeView';
 import { ReceptionView } from './pages/ReceptionView';
 import { PatientView } from './pages/PatientView';
 import { AppointmentType } from './types';
@@ -33,6 +34,7 @@ const MainLayout: React.FC = () => {
 
       <main className="flex-1 w-full px-4 sm:px-8 lg:px-12 py-6">
         {persona === 'MANAGER' && <ManagerView />}
+        {persona === 'EMPLOYEE' && <EmployeeView />}
         {persona === 'RECEPTIONIST' && <ReceptionView onNewBooking={handleOpenGeneral} />}
         {persona === 'PATIENT' && (
           <PatientView

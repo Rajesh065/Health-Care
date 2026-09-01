@@ -11,6 +11,14 @@ export const HOSPITAL_USERS: HospitalUser[] = [
     department: 'Hospital Administration & Asset Management'
   },
   {
+    id: 'u-employee',
+    name: 'Dr. Sarah Jenkins, MD',
+    email: 'sarah.jenkins@stjudemedical.org',
+    persona: 'EMPLOYEE',
+    role: 'Senior Consultant Orthopedic Surgeon (EMP-8024)',
+    department: 'Orthopedics & Surgical Operation Theatres'
+  },
+  {
     id: 'u-receptionist',
     name: 'Priya Nair',
     email: 'reception@stjudemedical.org',
