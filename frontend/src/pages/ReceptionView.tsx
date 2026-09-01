@@ -16,7 +16,7 @@ import {
 
 export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBooking }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'CHECKED_IN' | 'COMPLETED' | 'REJECTED'>('ALL');
+  const [filter, setFilter] = useState<'ALL' | 'WAITING' | 'ACCEPTED' | 'COMPLETED' | 'REJECTED'>('ALL');
   const [rejectingApt, setRejectingApt] = useState<Appointment | null>(null);
   const [selectedPresetReason, setSelectedPresetReason] = useState('Doctor in Emergency Surgery (Chamber Suspended)');
   const [customReasonNote, setCustomReasonNote] = useState('');
@@ -31,8 +31,8 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
     return () => window.removeEventListener('medflow_live_update', load);
   }, []);
 
-  const handleCheckIn = async (id: string) => {
-    await api.updateStatus(id, 'Checked In');
+  const handleAccept = async (id: string) => {
+    await api.updateStatus(id, 'Accepted');
   };
 
   const handleConfirmReject = async (e: React.FormEvent) => {
@@ -51,7 +51,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
 
   const filtered = appointments.filter(a => {
     if (filter === 'WAITING') return a.status === 'Waiting';
-    if (filter === 'CHECKED_IN') return a.status === 'Checked In';
+    if (filter === 'ACCEPTED') return a.status === 'Accepted';
     if (filter === 'COMPLETED') return a.status === 'Completed';
     if (filter === 'REJECTED') return a.status === 'Rejected';
     return true;
@@ -68,7 +68,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
               PRIYA NAIR (RECEPTIONIST)
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Accept and check-in patient tokens, or reject overbooked slots with clear explanation</p>
+          <p className="text-xs text-slate-500 mt-0.5">Accept patient appointment tokens or reject overbooked slots with clear explanation</p>
         </div>
 
         <button
@@ -100,12 +100,12 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
             Waiting ({appointments.filter(a => a.status === 'Waiting').length})
           </button>
           <button
-            onClick={() => setFilter('CHECKED_IN')}
+            onClick={() => setFilter('ACCEPTED')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
-              filter === 'CHECKED_IN' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
+              filter === 'ACCEPTED' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
-            Checked In ({appointments.filter(a => a.status === 'Checked In').length})
+            Accepted ({appointments.filter(a => a.status === 'Accepted').length})
           </button>
           <button
             onClick={() => setFilter('COMPLETED')}
@@ -141,7 +141,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
               <div className={`w-12 h-12 rounded-2xl text-white flex items-center justify-center font-mono font-black text-sm shrink-0 shadow-xs ${
                 a.status === 'Rejected' ? 'bg-rose-800' :
                 a.status === 'Completed' ? 'bg-emerald-800' :
-                a.status === 'Checked In' ? 'bg-blue-800' : 'bg-teal-800'
+                a.status === 'Accepted' ? 'bg-blue-800' : 'bg-teal-800'
               }`}>
                 {a.tokenNumber}
               </div>
@@ -169,7 +169,7 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
               <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl font-mono ${
                 a.status === 'Completed'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : a.status === 'Checked In'
+                  : a.status === 'Accepted'
                   ? 'bg-blue-50 text-blue-800 border border-blue-200 animate-pulse'
                   : a.status === 'Rejected'
                   ? 'bg-rose-50 text-rose-700 border border-rose-200'
@@ -181,11 +181,11 @@ export const ReceptionView: React.FC<{ onNewBooking: () => void }> = ({ onNewBoo
               {a.status === 'Waiting' && (
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleCheckIn(a.id)}
+                    onClick={() => handleAccept(a.id)}
                     className="bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Accept & Check-In</span>
+                    <span>Accept Appointment</span>
                   </button>
 
                   <button

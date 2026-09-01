@@ -72,8 +72,8 @@ export const LoginPage: React.FC = () => {
                 <p className="text-xs text-teal-900 font-semibold mt-0.5">Priya Nair (Appointments Lead)</p>
               </div>
               <div className="pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-1.5">
-                <p>• Accept / Check-In Patient Tokens</p>
-                <p className="text-rose-700 font-semibold">• Reject / Cancel with Stated Reasons</p>
+                <p>• Accept Patient Tokens</p>
+                <p className="text-rose-700 font-semibold">• Reject with Stated Reasons</p>
                 <p>• Walk-In Patient Registration</p>
               </div>
             </div>

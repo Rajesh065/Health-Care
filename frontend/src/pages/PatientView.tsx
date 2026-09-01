@@ -128,7 +128,7 @@ export const PatientView: React.FC<{
 
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl ${
                   a.status === 'Completed' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
-                  a.status === 'Checked In' ? 'bg-blue-50 text-blue-800 border border-blue-200' :
+                  a.status === 'Accepted' ? 'bg-blue-50 text-blue-800 border border-blue-200' :
                   a.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
                   'bg-amber-50 text-amber-800 border border-amber-200'
                 }`}>
