@@ -205,7 +205,7 @@ const DEFAULT_ATTENDANCE_LOGS: AttendanceDayRecord[] = [
 ];
 
 const DEFAULT_EMPLOYEE_LEAVES: EmployeeLeaveRecord[] = [
-  { id: 'LV-101', employeeName: 'Dr. Sarah Jenkins, MD', role: 'Senior Consultant Orthopedic Surgeon', department: 'Orthopedics', leaveType: 'Conference', startDate: 'Sep 10, 2026', endDate: 'Sep 12, 2026', reason: 'Attending Global Orthopedic Robotics & Joint Replacement Congress in Boston', substituteCover: 'Dr. Kevin O'Connor (On-Call)', approvalStatus: 'Approved', managerNote: 'Approved. Dr. Kevin O'Connor confirmed on-call substitute cover.', appliedDate: 'Aug 28, 2026' },
+  { id: 'LV-101', employeeName: 'Dr. Sarah Jenkins, MD', role: 'Senior Consultant Orthopedic Surgeon', department: 'Orthopedics', leaveType: 'Conference', startDate: 'Sep 10, 2026', endDate: 'Sep 12, 2026', reason: 'Attending Global Orthopedic Robotics & Joint Replacement Congress in Boston', substituteCover: "Dr. Kevin O'Connor (On-Call)", approvalStatus: 'Approved', managerNote: "Approved. Dr. Kevin O'Connor confirmed on-call substitute cover.", appliedDate: 'Aug 28, 2026' },
   { id: 'LV-102', employeeName: 'Dr. Marcus Reed, MD', role: 'Senior Pulmonologist', department: 'Pulmonology', leaveType: 'Conference', startDate: 'Today', endDate: 'Sep 04, 2026', reason: 'Attending International Respiratory & Chest Medicine Symposium in Chicago', substituteCover: 'Dr. Arthur Sterling (On-Call)', approvalStatus: 'Approved', managerNote: 'Approved. Emergency coverage verified.', appliedDate: 'Aug 25, 2026' },
   { id: 'LV-103', employeeName: 'Nurse Jennifer Lopez, BSN', role: 'Senior OT Scrub Nurse', department: 'Operation Theatres', leaveType: 'Casual', startDate: 'Today', endDate: 'Today Evening', reason: 'Family medical emergency', substituteCover: 'Nurse Clara Oswald, RN', approvalStatus: 'Approved', managerNote: 'Approved. Nurse Clara Oswald taking scrub lead.', appliedDate: 'Aug 31, 2026' },
   { id: 'LV-104', employeeName: 'Robert Langdon', role: 'Biomedical Senior Technician', department: 'Biomedical Engineering', leaveType: 'Emergency', startDate: 'Sep 02, 2026', endDate: 'Sep 05, 2026', reason: 'Urgent family relocation matter', substituteCover: 'Biomed. Nathan Drake', approvalStatus: 'Pending Review', appliedDate: 'Aug 30, 2026' }
@@ -227,7 +227,7 @@ const DEFAULT_WARD_BEDS: WardBedAllocation[] = [
   { id: 'WB-04', wardName: 'General Medical Inpatient Ward', floor: 'Floor 1 (Wings A & B)', totalBeds: 150, occupiedBeds: 134, availableBeds: 16, headNurse: 'David Hernandez, RN', ventilatorCount: 8 },
   { id: 'WB-05', wardName: 'Pediatrics & Neonatal NICU', floor: 'Floor 1 (Child Wing)', totalBeds: 40, occupiedBeds: 32, availableBeds: 8, headNurse: 'Amanda Clark, RN', ventilatorCount: 10 },
   { id: 'WB-06', wardName: 'Maternity & Gynecology Recovery', floor: 'Floor 2 (Wing A)', totalBeds: 50, occupiedBeds: 41, availableBeds: 9, headNurse: 'Helen Hayes, RN', ventilatorCount: 2 },
-  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: 'Brian O'Connor, RN', ventilatorCount: 12 },
+  { id: 'WB-07', wardName: 'Emergency Casualty & Triage Beds', floor: 'Ground Floor ER', totalBeds: 25, occupiedBeds: 18, availableBeds: 7, headNurse: "Brian O'Connor, RN", ventilatorCount: 12 },
   { id: 'WB-08', wardName: 'Day Care Surgery & Chemotherapy', floor: 'Floor 4 (Center Wing)', totalBeds: 50, occupiedBeds: 43, availableBeds: 7, headNurse: 'Rachel Adams, RN', ventilatorCount: 2 }
 ];
 
