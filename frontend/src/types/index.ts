@@ -68,12 +68,36 @@ export interface DischargeRecord {
   summary: string;
 }
 
+export interface StaffAttendanceRecord {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  status: 'ON_DUTY' | 'ON_LEAVE';
+  shiftTime?: string;
+  leaveReason?: string;
+  substituteCover?: string;
+}
+
 export interface MDStats {
   admittedTodayCount: number;
   dischargedTodayCount: number;
   totalBeds: number;
   occupiedBeds: number;
-  icuOccupancy: number;
-  doctorsOnDuty: number;
+  icuOccupancyPercent: number;
+  activeSurgeriesCount: number;
+  totalStaffCount: number;
+  staffOnDutyCount: number;
+  staffOnLeaveCount: number;
+  todayRevenueUsd: number;
+  revenueBreakdown: {
+    inpatientWardCharges: number;
+    opdConsultations: number;
+    surgeriesAndOT: number;
+    pharmacyDispensary: number;
+    labDiagnostics: number;
+  };
+  bloodBankOveUnits: number;
+  oxygenReservesPercent: number;
   erWaitTimeMinutes: number;
 }
