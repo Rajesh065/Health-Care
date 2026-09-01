@@ -21,6 +21,10 @@ export interface HospitalUser {
   persona: UserPersona;
   role: string;
   department: string;
+  employeeId?: string;
+  shiftTiming?: string;
+  password?: string;
+  phone?: string;
 }
 
 export interface Appointment {

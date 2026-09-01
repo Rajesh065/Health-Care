@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth, HOSPITAL_USERS } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import {
   Plus,
   ChevronDown,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) => {
-  const { currentUser, persona, switchUser, logout } = useAuth();
+  const { currentUser, persona, allUsers, switchUserById, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
           {persona === 'EMPLOYEE' && (
             <>
               <Stethoscope className="w-4 h-4 text-purple-700" />
-              <span>Doctor / Staff (Surgeon & Clinical Portal)</span>
+              <span>Doctor / Staff ({currentUser.name})</span>
             </>
           )}
           {persona === 'RECEPTIONIST' && (
@@ -65,7 +65,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
 
           {persona === 'PATIENT' && <div className="h-5 w-px bg-slate-200"></div>}
 
-          {/* Profile & 4-Role Switcher */}
+          {/* Profile & Switcher */}
           <div className="relative">
             <div
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -84,7 +84,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                   {persona === 'MANAGER'
                     ? 'Hospital Manager'
                     : persona === 'EMPLOYEE'
-                    ? 'Doctor (Surgeon)'
+                    ? 'Doctor / Staff'
                     : persona === 'RECEPTIONIST'
                     ? 'Receptionist'
                     : 'Patient'}
@@ -94,7 +94,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
             </div>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 text-xs space-y-2">
+              <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 text-xs space-y-2 max-h-[85vh] overflow-y-auto">
                 <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="font-bold text-slate-900 block">{currentUser.name}</span>
                   <span className="text-[10px] text-slate-400 font-mono block">{currentUser.email}</span>
@@ -110,15 +110,15 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
 
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1 py-1">
-                    Switch Hospital Role:
+                    Switch Active User Account:
                   </span>
                   <div className="space-y-1">
-                    {HOSPITAL_USERS.map(u => (
+                    {allUsers.map(u => (
                       <button
-                        key={u.persona}
-                        onClick={() => { switchUser(u.persona); setDropdownOpen(false); }}
+                        key={u.id}
+                        onClick={() => { switchUserById(u.id); setDropdownOpen(false); }}
                         className={`w-full text-left px-2.5 py-2 rounded-xl transition-all flex items-center justify-between cursor-pointer ${
-                          currentUser.persona === u.persona ? 'bg-slate-900 text-white font-bold' : 'text-slate-700 hover:bg-slate-100'
+                          currentUser.id === u.id ? 'bg-slate-900 text-white font-bold' : 'text-slate-700 hover:bg-slate-100'
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -126,11 +126,10 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                           {u.persona === 'EMPLOYEE' && <Stethoscope className="w-3.5 h-3.5 text-purple-400" />}
                           {u.persona === 'RECEPTIONIST' && <CalendarCheck className="w-3.5 h-3.5 text-teal-400" />}
                           {u.persona === 'PATIENT' && <User className="w-3.5 h-3.5 text-emerald-400" />}
-                          <span>
-                            {u.persona === 'MANAGER' ? 'Manager (Hospital Operations)' :
-                             u.persona === 'EMPLOYEE' ? 'Doctor / Staff (Dr. Sarah Jenkins)' :
-                             u.persona === 'RECEPTIONIST' ? 'Receptionist' : 'Patient'}
-                          </span>
+                          <div className="leading-tight">
+                            <span className="block font-bold">{u.name}</span>
+                            <span className="text-[9px] opacity-75 block">{u.role}</span>
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -143,7 +142,7 @@ export const Navbar: React.FC<{ onBookClick: () => void }> = ({ onBookClick }) =
                     className="w-full text-left px-2.5 py-1.5 text-rose-700 hover:bg-rose-50 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
-                    <span>Log Out to Login Hub</span>
+                    <span>Log Out to Login & Sign Up Hub</span>
                   </button>
                 </div>
               </div>
